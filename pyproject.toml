@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling==1.32.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "protean"
+version = "0.1.0"
+description = "PROTEAN — a small loop around Claude Code: a director seat plans units, a contained editor does each one, a grader verifies, a mailbox carries questions."
+requires-python = ">=3.13"
+dependencies = [
+    "pydantic==2.13.5",
+    "PyYAML==6.0.3",
+]
+
+[project.scripts]
+protean = "protean.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/protean"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# tests/protean/ is a package named like the source package; importlib mode keeps
+# `import protean` resolving to src/protean instead of the tests directory.
+addopts = "--import-mode=importlib --strict-markers"

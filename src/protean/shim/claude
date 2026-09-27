@@ -1,0 +1,4 @@
+#!/bin/sh
+# Stands in for the model binary on a command predicate's PATH: grading never calls a model.
+echo "protean: model calls are not allowed from a command predicate" >&2
+exit 89

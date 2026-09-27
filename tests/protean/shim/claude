@@ -1,0 +1,4 @@
+#!/bin/sh
+# Stand-in for the model binary, first on PATH for every protean test. Reaching it is a failure.
+echo "SHIM: the real binary was reached" >&2
+exit 89

@@ -1,0 +1,9 @@
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.venv/
+.DS_Store
+# brain/protean — runtime state beside the tracked prompts and config
+brain/protean/state/
+brain/protean/mailbox/
+brain/protean/workspaces/

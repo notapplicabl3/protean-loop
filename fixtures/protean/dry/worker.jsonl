@@ -1,0 +1,2 @@
+{"write": {"hello.txt": "hello, dry world\n"}, "commit": true, "exit_code": 0, "result": "Created hello.txt with a greeting and committed it.", "total_cost_usd": 0.5}
+{"write": {"notes/plan.md": "# Plan\n\n- step one: say hello\n"}, "commit": true, "exit_code": 0, "result": "Wrote notes/plan.md with the first step and committed it.", "total_cost_usd": 0.5}
