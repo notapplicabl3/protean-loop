@@ -1,6 +1,6 @@
 # PROTEAN
 
-PROTEAN runs Claude Code inside a small loop that gives a goal durable state, a dollar budget, a human mailbox and a grade for every unit of work.
+PROTEAN runs Claude Code inside a graph loop that gives a goal durable state, a dollar budget, a human mailbox and a grade for every unit of work.
 
 A director seat (one Claude Code session) turns the goal into small units, each with checkable predicates. For each unit a contained editor subagent works in a clone of the workspace on its own branch. A grader checks the predicates; only the grader marks a unit passed. The loop stops on a dollar or tick ceiling, parks when the director asks you a question, and ends `done` when every unit is verified. That is the whole program.
 
