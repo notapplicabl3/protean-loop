@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 
 from protean.state import (
-    Predicate, Root, Task, Unit, all_verified, append_log, current, from_json, load,
+    Predicate, Root, Task, Unit, all_verified, append_log, block_dependents, current, from_json, load,
     new_task_id, pending_unit, save, set_current, to_json,
 )
 
@@ -83,3 +83,31 @@ def test_pending_unit_and_all_verified(task: Task):
     assert all_verified(task)
     task.units[0].status = "descoped"
     assert not all_verified(task)
+
+
+def test_a_task_file_from_before_needs_loads_with_the_defaults():
+    data = json.loads(to_json(Task("t", "g", "/w", units=[Unit("u1", "a", [Predicate("file_exists", {"path": "a"})])])))
+    del data["accepted"]
+    for key in ("needs", "candidate", "integrated"):
+        del data["units"][0][key]
+    task = from_json(json.dumps(data))
+    assert task.accepted is None and (task.units[0].needs, task.units[0].candidate, task.units[0].integrated) == ([], None, False)
+
+
+def test_pending_unit_is_the_first_whose_needs_have_passed_and_been_integrated():
+    pred = [Predicate("file_exists", {"path": "a"})]
+    task = Task("t", "g", "/w", units=[Unit("u3", "c", pred, needs=["u1", "u2"]), Unit("u1", "a", pred), Unit("u2", "b", pred)])
+    assert pending_unit(task).id == "u1"
+    task.units[1].status = task.units[2].status = "passed"
+    assert pending_unit(task) is None
+    task.units[1].integrated = task.units[2].integrated = True
+    assert pending_unit(task).id == "u3"
+
+
+def test_block_dependents_blocks_transitively_and_only_once():
+    pred = [Predicate("file_exists", {"path": "a"})]
+    task = Task("t", "g", "/w", units=[Unit("u3", "c", pred, needs=["u2"]), Unit("u2", "b", pred, needs=["u1"]),
+                                       Unit("u1", "a", pred, "failed", 2), Unit("u4", "d", pred)])
+    assert [(u.id, need.id) for u, need in block_dependents(task)] == [("u2", "u1"), ("u3", "u2")]
+    assert [u.status for u in task.units] == ["blocked", "blocked", "failed", "pending"] and not all_verified(task)
+    assert block_dependents(task) == [] and pending_unit(task).id == "u4"

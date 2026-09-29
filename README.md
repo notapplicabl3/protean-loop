@@ -13,18 +13,21 @@ uv sync --locked
 uv run pytest tests/protean -q   # the battery; a shim on PATH fails any test that reaches the real binary
 uv run protean dry dry           # scripted seats: a goal to done in a scratch root, no model call
 uv run protean dry stuck         # the director asks a question; exits 12
+uv run protean dry deps          # a unit planned first waits for the two it needs, then sees their work
 ```
 
 | Verb | What it does |
 |---|---|
-| `protean run "<goal>" --workspace <path> [--project <slug>]` | Start a task. Spends money. Use a git clone as the workspace; the editor's work lands there as branches `unit/<task>/<unit>`, never merged. |
+| `protean run "<goal>" --workspace <path> [--project <slug>]` | Start a task. Spends money. Use a git clone as the workspace; the editor's work lands there as branches `unit/<task>/<unit>`, and each passed unit moves `task/<task>` forward. Nothing is merged; `main` is never touched. |
 | `protean resume [--extend N \| $X] [--abandon]` | Continue after you answer a question; widen the tick or dollar ceiling of a stopped task; or close the task. |
 | `protean status` | Task, tick, terminal, stop reason, units and their statuses, cost, open question. |
-| `protean dry <scenario>` | Run a fixture scenario (`dry`, `stuck`) in a temporary root. |
+| `protean dry <scenario>` | Run a fixture scenario (`dry`, `stuck`, `deps`, `deps-broken`, `deps-blocked`) in a temporary root. |
 
 `--brain PATH` picks the root (default `brain/protean/`). A question lands at `brain/protean/mailbox/open/<task>.md`; write under `## Answer` and `protean resume`. Exit codes: done 0, stopped on a ceiling 11, parked on a question 12, interrupted by Ctrl-C/SIGTERM/SIGHUP 130, usage or error 2.
 
 Caps live in `brain/protean/config.json`: $10 per task, $2 per director call, $4 per editor call, each call clipped to what the task has left, no call under $0.50 left. Cost is summed from the CLI's own receipts; a call that leaves no receipt is charged the cap it carried, and an interrupted call (Ctrl-C, SIGTERM, SIGHUP) books the cap while it runs and the receipt's cost once it has returned, on disk before the signal propagates.
+
+`task/<task>` is the task's accepted work: it starts at the workspace HEAD when the first unit runs, every unit branches from its tip, and it only fast-forwards to a unit's commit once that unit passed and every earlier passed unit's file and command predicates still hold on it. A unit may name `needs`; it runs only after they pass, and when one fails or is descoped it becomes `blocked`.
 
 A unit passes only when its branch carries a change and every predicate holds. Four predicate kinds: `file_exists` and `file_contains` read the branch's committed regular files (never the working tree, a symlink, a nested repo or `.git`); `exit_code` is the worker's own reported verification code, never sufficient on its own; and a `command` predicate runs in the clone under `sandbox-exec` with no network and writes confined to the clone, uv's caches and the temp dirs.
 
@@ -34,6 +37,7 @@ A unit passes only when its branch carries a change and every predicate holds. F
 src/protean/          state · grade · budget · mailbox · runner · director · worker · loop · dry · cli
 brain/protean/        director.md, editor.md, config.json (tracked) · state/, mailbox/, workspaces/ (gitignored)
 fixtures/protean/     the dry scenarios
+<workspace>           task/<task> (accepted work, fast-forward only) · unit/<task>/<unit> (each attempt's delivery)
 tests/protean/        the battery and the shim
 evidence/live-1-2026-09-27/   the first live run: task record, event log, run output (done, 3 ticks, $0.75)
 evidence/live-2-2026-09-27/   the second: parked twice and resumed twice, done in 5 ticks for $2.62

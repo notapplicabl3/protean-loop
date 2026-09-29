@@ -35,7 +35,7 @@ class ScriptedRunner:
     """A Runner that answers from two queues and records every call it is given.
 
     A director entry is the whole stdout object the CLI would print. A worker entry acts inside
-    the clone it is started in: `write` files, `commit` them, then report `result` with an
+    the clone it is started in: `write` files, `delete` paths, `commit` them, then report `result` with an
     `exit_code: N` line and `total_cost_usd`.
     """
 
@@ -59,6 +59,8 @@ class ScriptedRunner:
             path = clone / rel
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content, encoding="utf-8")
+        for rel in entry.get("delete", []):
+            (clone / rel).unlink()
         if entry.get("commit"):
             _git(["add", "-A"], clone)
             _git(["commit", "--quiet", "--allow-empty", "-m", "dry: scripted worker"], clone)

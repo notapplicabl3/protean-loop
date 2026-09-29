@@ -169,3 +169,46 @@ def test_pending_notes_cross_the_role_rename(root: Root):
     assert director.pending_notes(root, "t") == ["The operator answered", "retry"]
     append_log(root, "t", {"event": "director"})
     assert director.pending_notes(root, "t") == []
+
+
+def _unit(uid: str, *needs: str) -> dict:
+    return {**UNIT, "id": uid, "needs": list(needs)}
+
+
+@pytest.mark.parametrize("units, error", [
+    ([_unit("u-2", "u-9")], "unit 'u-2': needs 'u-9', which is no unit in the task or this plan"),
+    ([_unit("u-2", "u-2")], "unit 'u-2': needs itself"),
+    ([_unit("u-2", "u-3"), _unit("u-3", "u-4"), _unit("u-4", "u-2")], "unit 'u-2': needs form a cycle: u-2 -> u-3 -> u-4 -> u-2"),
+    ([{**UNIT, "needs": "u1"}], "unit 'u-2': needs must be a list of unit ids"),
+])
+def test_decode_rejects_bad_needs(task: Task, units: list, error: str):
+    reply, errors = director.decode(json.dumps({"units": units}), task)
+    assert reply is None and error in errors, errors
+
+
+def test_decode_takes_needs_on_the_task_and_later_in_the_same_plan(task: Task):
+    reply, errors = director.decode(json.dumps({"units": [_unit("u-3", "u-2", "u1"), _unit("u-2")]}), task)
+    assert errors == [] and [(u.id, u.needs) for u in reply.units] == [("u-3", ["u-2", "u1"]), ("u-2", [])]
+    assert director.decode(json.dumps({"units": [UNIT]}), task)[0].units[0].needs == []
+
+
+def test_the_view_shows_needs_and_the_prompt_documents_them(task: Task):
+    task.units[0].needs = ["u0"]
+    assert director.view(task, Caps(), [])["units"][0]["needs"] == ["u0"]
+    prompt = (REPO / "brain" / "protean" / "director.md").read_text()
+    assert '"needs"' in prompt and "`blocked`" in prompt
+
+
+def test_decode_refuses_to_descope_a_passed_unit(task: Task):
+    task.units[0].status, task.units[0].candidate, task.units[0].integrated = "passed", "abc", True
+    reply, errors = director.decode('{"descope": ["u1"], "reason": "not needed"}', task)
+    assert reply is None and "u1 has passed and cannot be descoped" in errors, errors
+
+
+def test_decode_refuses_a_need_on_a_unit_that_passed_before_the_accepted_branch(task: Task):
+    task.units[0].status = "passed"
+    reply, errors = director.decode(json.dumps({"units": [_unit("u-2", "u1")]}), task)
+    assert reply is None and errors == [
+        "unit 'u-2': needs 'u1', which passed before the accepted branch existed and cannot be built on"], errors
+    task.units[0].candidate, task.units[0].integrated = "abc", True
+    assert director.decode(json.dumps({"units": [_unit("u-2", "u1")]}), task)[1] == []

@@ -1,7 +1,8 @@
 """One contained editor call per unit, in a fresh clone with no remote, on branch `unit/<task>/<unit>`.
 
-The branch is fetched back into the workspace; nothing is ever merged or pushed. Only a clone left
-clean on its branch, and fetched, counts as delivered.
+The branch starts at the tip of `task/<task>`, the work accepted so far, and is fetched back into the
+workspace; nothing is ever merged or pushed. Only a clone left clean on its branch, fetched, and
+still extending that tip counts as delivered.
 """
 
 from __future__ import annotations
@@ -37,7 +38,7 @@ class WorkerError(RuntimeError):
 class WorkerResult:
     """What one unit's call produced. `exit_code` is None unless the worker reported one itself;
     `delivered` is false, with the reason in `delivery_note`, when the workspace did not receive
-    exactly what the clone holds."""
+    exactly what the clone holds. `candidate` is the branch's commit when it extends the accepted tip."""
 
     exit_code: int | None
     cost_usd: float
@@ -47,6 +48,7 @@ class WorkerResult:
     changed: list[str]
     delivered: bool
     delivery_note: str
+    candidate: str = ""
 
 
 def git(args: list[str], cwd: Path) -> str:
@@ -55,6 +57,24 @@ def git(args: list[str], cwd: Path) -> str:
     if proc.returncode != 0:
         raise WorkerError(f"git {' '.join(args)}: {proc.stderr.strip()}")
     return proc.stdout
+
+
+def accepted_ref(task: Task) -> str:
+    """The workspace ref that holds the task's accepted work."""
+    return f"refs/heads/task/{task.id}"
+
+
+def accepted_tip(task: Task) -> str:
+    """The commit `task/<task>` points at. The first unit starts the branch at the workspace HEAD; a
+    branch a crash left behind before the task was saved is taken as it stands."""
+    if task.accepted is None:
+        workspace, ref = Path(task.workspace), accepted_ref(task)
+        try:
+            task.accepted = git(["rev-parse", "--verify", "--quiet", ref], workspace).strip()
+        except WorkerError:
+            task.accepted = git(["rev-parse", "HEAD"], workspace).strip()
+            git(["update-ref", ref, task.accepted, ""], workspace)
+    return task.accepted
 
 
 def argv(task: Task, caps: Caps, root: Root) -> list[str]:
@@ -114,22 +134,35 @@ def _undelivered(clone: Path, branch: str) -> list[str]:
     return problems
 
 
+def clone_changes(clone: Path, candidate: str) -> str:
+    """Why the clone no longer holds exactly the candidate once the check commands have run; "" when it does.
+    A moved HEAD or a file left behind would let a later check read something other than what is accepted."""
+    try:
+        head = git(["rev-parse", "HEAD"], clone).strip()
+        dirty = git(["status", "--porcelain"], clone).strip()
+    except WorkerError as exc:
+        return f"check commands changed the clone: {exc}"
+    problems = (["check commands changed the clone: HEAD moved"] if head != candidate else [])
+    return "; ".join(problems + (["check commands left the clone dirty"] if dirty else []))
+
+
 def run_unit(task: Task, unit: Unit, caps: Caps, root: Root, runner: Runner, charge: Charge = no_charge) -> WorkerResult:
-    """Clone, drop the remote, exclude build output, branch, run the editor, check delivery, fetch the
-    branch into the workspace, list what changed. A branch with no change on it delivered nothing.
+    """Clone, branch from the accepted tip, drop the remote, exclude build output, run the editor, check
+    delivery, fetch the branch into the workspace, list what changed. A branch with no change on it
+    delivered nothing; one that no longer contains the accepted tip rewrote history.
     A call interrupted before it returns is charged its cap through `charge` before propagating."""
     workspace, branch = Path(task.workspace), f"unit/{task.id}/{unit.id}"
+    base = accepted_tip(task)
     clone = root.clones_dir(task.id).resolve() / unit.id
     if clone.exists():
         shutil.rmtree(clone)
     clone.parent.mkdir(parents=True, exist_ok=True)
     git(["clone", "--quiet", "--local", "--no-hardlinks", str(workspace), str(clone)], clone.parent)
+    git(["checkout", "--quiet", "-B", branch, base], clone)
     git(["remote", "remove", "origin"], clone)
     exclude = clone / ".git" / "info" / "exclude"
     exclude.parent.mkdir(parents=True, exist_ok=True)
     exclude.write_text("\n".join(BUILD_OUTPUT) + "\n", encoding="utf-8")
-    git(["checkout", "--quiet", "-B", branch], clone)
-    base = git(["rev-parse", "HEAD"], clone).strip()
     call = argv(task, caps, root)
     try:
         res = runner(call, message(unit), clone, caps.worker_wall_seconds)
@@ -147,9 +180,15 @@ def run_unit(task: Task, unit: Unit, caps: Caps, root: Root, runner: Runner, cha
             changed = git(["diff", "--name-only", f"{base}..{branch}"], clone).splitlines()
         except WorkerError:
             changed = []
+        try:
+            candidate = git(["rev-parse", "--verify", branch], clone).strip()
+            git(["merge-base", "--is-ancestor", base, candidate], clone)
+        except WorkerError:
+            candidate = ""
+            problems.append(f"the branch does not extend the accepted tip {base[:12]}: history was rewritten")
     except BaseException:
         charge(cost)
         raise
     if not problems and not changed:
         problems.append("no change on the branch: nothing was delivered")
-    return WorkerResult(exit_code, cost, summary, clone, branch, changed, not problems, "; ".join(problems))
+    return WorkerResult(exit_code, cost, summary, clone, branch, changed, not problems, "; ".join(problems), candidate)

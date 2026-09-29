@@ -80,7 +80,7 @@ def view(task: Task, caps: Caps, notes: list[str]) -> dict[str, Any]:
         "ticks_left": caps.max_ticks + task.extra_ticks - task.tick,
         "max_attempts_per_unit": caps.max_attempts_per_unit,
         "units": [
-            {"id": u.id, "intent": u.intent, "status": u.status, "attempts": u.attempts,
+            {"id": u.id, "intent": u.intent, "status": u.status, "attempts": u.attempts, "needs": u.needs,
              "summary": u.summary, "predicates": [asdict(p) for p in u.predicates]}
             for u in task.units
         ],
@@ -159,8 +159,11 @@ def _decode_units(items: object, task: Task) -> tuple[list[Unit], list[str]]:
         if not isinstance(item, dict):
             errors.append(f"unit {n}: must be an object")
             continue
-        uid, intent, preds = item.get("id"), item.get("intent"), item.get("predicates")
+        uid, intent, preds, needs = item.get("id"), item.get("intent"), item.get("predicates"), item.get("needs", [])
         label = f"unit {uid!r}" if isinstance(uid, str) else f"unit {n}"
+        if not isinstance(needs, list) or not all(isinstance(need, str) for need in needs):
+            errors.append(f"{label}: needs must be a list of unit ids")
+            needs = []
         if not isinstance(uid, str) or not UNIT_ID.fullmatch(uid):
             errors.append(f"{label}: id must match {UNIT_ID.pattern}")
         elif uid in seen:
@@ -174,8 +177,42 @@ def _decode_units(items: object, task: Task) -> tuple[list[Unit], list[str]]:
         errors += [f"{label}: {problem}" for problem in grade.validate(predicates)]
         if isinstance(uid, str):
             seen.add(uid)
-            units.append(Unit(id=uid, intent=str(intent), predicates=predicates))
-    return units, errors
+            units.append(Unit(id=uid, intent=str(intent), predicates=predicates, needs=list(dict.fromkeys(needs))))
+    return units, errors + _need_errors(units, task)
+
+
+def _need_errors(units: list[Unit], task: Task) -> list[str]:
+    """A need naming no unit in the task or this plan, a unit needing itself, and needs that form a cycle."""
+    graph = {u.id: u.needs for u in task.units + units}
+    legacy = {u.id for u in task.units if u.status == "passed" and not u.candidate}
+    errors = []
+    for unit in units:
+        for need in unit.needs:
+            if need == unit.id:
+                errors.append(f"unit {unit.id!r}: needs itself")
+            elif need not in graph:
+                errors.append(f"unit {unit.id!r}: needs {need!r}, which is no unit in the task or this plan")
+            elif need in legacy:
+                errors.append(f"unit {unit.id!r}: needs {need!r}, which passed before the accepted branch existed "
+                              "and cannot be built on")
+        path = _cycle(unit.id, graph)
+        if path:
+            errors.append(f"unit {unit.id!r}: needs form a cycle: {' -> '.join(path)}")
+    return errors
+
+
+def _cycle(start: str, graph: dict[str, list[str]]) -> list[str] | None:
+    """A path of needs from `start` back to itself, or None; a unit needing itself is reported apart."""
+    stack, seen = [[start]], {start}
+    while stack:
+        path = stack.pop()
+        for need in graph.get(path[-1], []):
+            if need == start and len(path) > 1:
+                return path + [start]
+            if need in graph and need not in seen:
+                seen.add(need)
+                stack.append(path + [need])
+    return None
 
 
 def decode(text: str, task: Task) -> tuple[Reply | None, list[str]]:
@@ -199,6 +236,9 @@ def decode(text: str, task: Task) -> tuple[Reply | None, list[str]]:
     known = {u.id for u in task.units}
     if not isinstance(value, list) or not value or not all(isinstance(v, str) and v in known for v in value):
         return None, [f"descope must be a non-empty list of existing unit ids ({', '.join(sorted(known)) or 'none'})"]
+    passed = [u.id for u in task.units if u.id in value and u.status == "passed"]
+    if passed:
+        return None, [f"{uid} has passed and cannot be descoped" for uid in passed]
     return Reply(descope=list(value), reason=str(obj.get("reason", ""))), []
 
 

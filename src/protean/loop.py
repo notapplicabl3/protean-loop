@@ -1,4 +1,8 @@
-"""The loop: each tick either asks the director or runs one pending unit; only the grader passes one."""
+"""The loop: each tick either asks the director or runs one runnable unit; only the grader passes one.
+
+A pass is two writes: the unit is saved `passed` with its candidate commit, then `task/<task>` moves to
+that commit and the unit is saved integrated. A tick or resume first finishes any pass cut between them.
+"""
 
 from __future__ import annotations
 
@@ -120,6 +124,70 @@ def _apply(reply: director.Reply, task: Task, caps: Caps, root: Root) -> str:
     return f"added {', '.join(u.id for u in reply.units)}"
 
 
+def _rechecks(task: Task, clone: Path) -> dict[str, str]:
+    """Every integrated unit's re-checkable predicates graded again in this clone: `<unit> <pid>` -> note
+    for each one that no longer holds."""
+    broke = {}
+    for other in task.units:
+        if other.integrated:
+            verdict = grade.grade(other, clone, None, grade.RECHECKABLE)
+            for pid in verdict.failed_ids + verdict.ungradeable_ids:
+                broke[f"{other.id} {pid}"] = verdict.notes[pid]
+    return broke
+
+
+def _integrate(task: Task, unit: Unit, root: Root) -> bool:
+    """The second write of a pass: move `task/<task>` from the accepted tip to the unit's candidate, then
+    record it. `update-ref` checks the old value; a ref already at the candidate is only recorded. A ref
+    moved anywhere else outside the loop parks the task on a question (once) and returns False."""
+    workspace, ref = Path(task.workspace), worker.accepted_ref(task)
+    try:
+        found = worker.git(["rev-parse", "--verify", "--quiet", ref], workspace).strip()
+    except worker.WorkerError:
+        found = "missing"
+    if found not in (unit.candidate, task.accepted):
+        if task.terminal != "interrupted":
+            question = (f"task/{task.id} was moved outside the loop: it should be at {task.accepted} "
+                        f"(the accepted tip before {unit.id}) but is {found[:12]}. Reset it with "
+                        f"`git update-ref {ref} {task.accepted}` in {task.workspace}, then `protean resume` "
+                        "continues the task; `protean resume --abandon` closes it.")
+            _ask(root, task, question, stale_tip=unit.id)
+            state.save(root, task)
+        return False
+    if found != unit.candidate:
+        worker.git(["update-ref", ref, str(unit.candidate), str(task.accepted)], workspace)
+    task.accepted, unit.integrated = unit.candidate, True
+    state.save(root, task)
+    state.append_log(root, task.id, {"event": "integrated", "unit": unit.id, "accepted": unit.candidate})
+    return True
+
+
+def _repair(task: Task, root: Root) -> bool:
+    """Finish every pass a kill cut between its two writes; the unit's worker never runs again.
+    False when a tip moved outside the loop leaves a pass unfinished."""
+    for unit in task.units:
+        if unit.status == "passed" and unit.candidate and not unit.integrated and not _integrate(task, unit, root):
+            return False
+    return True
+
+
+def _stale_tip_asked(root: Root, task_id: str) -> bool:
+    """The open question is the runtime's own, about a tip moved outside the loop."""
+    asked = [event for event in director.read_log(root, task_id) if event.get("event") == "question"]
+    return bool(asked) and "stale_tip" in asked[-1]
+
+
+_BLOCKED_BY = {"failed": "failed", "descoped": "was descoped", "blocked": "is blocked"}
+
+
+def _block(task: Task, root: Root) -> None:
+    """Block every pending unit whose need failed, was descoped or is blocked, and tell the director."""
+    for unit, need in state.block_dependents(task):
+        note = (f"{unit.id} is blocked: it needs {need.id}, which {_BLOCKED_BY[need.status]}. "
+                f"Descope {unit.id}; plan a new unit if its work is still wanted.")
+        state.append_log(root, task.id, {"event": "blocked", "unit": unit.id, "need": need.id, "to_director": note})
+
+
 def _worker_step(task: Task, unit: Unit, caps: Caps, root: Root, runner: Runner) -> str:
     unit.attempts += 1
     res = worker.run_unit(task, unit, caps, root, runner, _charger(task, root, "worker"))
@@ -127,24 +195,38 @@ def _worker_step(task: Task, unit: Unit, caps: Caps, root: Root, runner: Runner)
     state.save(root, task)
     if res.delivered:
         verdict = grade.grade(unit, res.clone, res.exit_code)
+        broke = _rechecks(task, res.clone) if verdict.passed else {}
+        tampered = worker.clone_changes(res.clone, res.candidate)
+        if tampered:
+            verdict, broke = grade.ungradeable(unit, tampered), {}
     else:
-        verdict = grade.ungradeable(unit, res.delivery_note)
-    if verdict.passed:
-        unit.status = "passed"
+        verdict, broke = grade.ungradeable(unit, res.delivery_note), {}
+    passed = verdict.passed and not broke
+    if passed:
+        unit.status, unit.candidate = "passed", res.candidate
     elif unit.attempts >= caps.max_attempts_per_unit:
         unit.status = "failed"
     misses = [f"{pid} {verdict.notes[pid]}"[:NOTE_LIMIT] for pid in verdict.failed_ids + verdict.ungradeable_ids]
-    grade_line = "passed" if verdict.passed else "; ".join(misses)
+    misses += [f"broke {key}: {note}"[:NOTE_LIMIT] for key, note in broke.items()]
+    grade_line = "passed" if passed else "; ".join(misses)
     unit.branch, unit.summary = res.branch, f"{res.summary} [grade: {grade_line}]"
     shutil.rmtree(res.clone, ignore_errors=True)
-    state.append_log(root, task.id, {
+    event = {
         "event": "verdict", "unit": unit.id, "attempt": unit.attempts, "status": unit.status,
-        "passed": verdict.passed, "passed_ids": verdict.passed_ids, "failed_ids": verdict.failed_ids,
+        "passed": passed, "passed_ids": verdict.passed_ids, "failed_ids": verdict.failed_ids,
         "ungradeable_ids": verdict.ungradeable_ids, "notes": verdict.notes, "exit_code": res.exit_code,
         "cost_usd": res.cost_usd, "branch": res.branch, "changed": res.changed, "delivered": res.delivered,
-    })
+    }
+    if broke:
+        event["broke"] = broke
+        event["to_director"] = (f"{unit.id} broke accepted work and was not accepted (attempt {unit.attempts}): "
+                                + "; ".join(misses))
+    state.append_log(root, task.id, event)
+    state.save(root, task)
+    if passed:
+        _integrate(task, unit, root)
     parts = [f"{label} {' '.join(ids)}" for label, ids in
-             (("failed", verdict.failed_ids), ("ungradeable", verdict.ungradeable_ids)) if ids]
+             (("failed", verdict.failed_ids), ("ungradeable", verdict.ungradeable_ids), ("broke", list(broke))) if ids]
     detail = f" ({'; '.join(parts)})" if parts else ""
     return f"{unit.id} attempt {unit.attempts}: {unit.status}{detail} (${res.cost_usd:.2f})"
 
@@ -155,9 +237,12 @@ def ceiling(task: Task, caps: Caps) -> str | None:
 
 
 def run_tick(task: Task, caps: Caps, root: Root, runner: Runner, echo: Echo = _silent) -> Task:
-    """One tick: stop at a ceiling or the call floor, else ask the director (no pending unit) or work one unit."""
+    """One tick: finish a cut pass, block units whose needs died, stop at a ceiling or the call floor, else
+    ask the director (no runnable unit) or work one unit."""
+    _repair(task, root)
     if task.terminal is not None:
         return task
+    _block(task, root)
     reason = ceiling(task, caps)
     if reason:
         task.terminal, task.stop_reason = "stopped", reason
@@ -166,6 +251,7 @@ def run_tick(task: Task, caps: Caps, root: Root, runner: Runner, echo: Echo = _s
         return task
     unit = state.pending_unit(task)
     line = _director_step(task, caps, root, runner) if unit is None else _worker_step(task, unit, caps, root, runner)
+    _block(task, root)
     task.tick += 1
     state.save(root, task)
     echo(f"tick {task.tick}: {line}")
@@ -253,6 +339,14 @@ def _resume(task: Task, root: Root, caps: Caps, runner: Runner, extend_usd: floa
         state.save(root, task)
         echo(terminal_line(root, task))
         return task
+    if not _repair(task, root):
+        echo(terminal_line(root, task))
+        return task
+    if task.terminal == "interrupted" and _stale_tip_asked(root, task.id):
+        mailbox.close(root, task.id, "repaired")
+        state.append_log(root, task.id, {"event": "repaired", "question": task.question})
+        task.terminal, task.question = None, None
+        state.save(root, task)
     extend = bool(extend_usd or extend_ticks)
     if task.terminal == "stopped":
         reason = ceiling(replace(task, extra_usd=task.extra_usd + extend_usd,

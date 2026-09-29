@@ -20,7 +20,10 @@ class Predicate:
 
 @dataclass
 class Unit:
-    """A small piece of work. `status` is one of pending, passed, failed, descoped."""
+    """A small piece of work. `status` is one of pending, passed, failed, descoped, blocked.
+
+    `needs` names units that must pass and be integrated first. `candidate` is the commit a pass
+    accepted; `integrated` turns true once `task/<task>` has moved to it."""
 
     id: str
     intent: str
@@ -29,11 +32,15 @@ class Unit:
     attempts: int = 0
     branch: str | None = None
     summary: str = ""
+    needs: list[str] = field(default_factory=list)
+    candidate: str | None = None
+    integrated: bool = False
 
 
 @dataclass
 class Task:
-    """A goal and its units. `terminal` is None while running, else done, stopped or interrupted."""
+    """A goal and its units. `terminal` is None while running, else done, stopped or interrupted.
+    `accepted` is the tip of `task/<id>` in the workspace, None until the first unit runs."""
 
     id: str
     goal: str
@@ -49,6 +56,7 @@ class Task:
     created: str = ""
     extra_usd: float = 0.0
     extra_ticks: int = 0
+    accepted: str | None = None
 
 
 def to_json(task: Task) -> str:
@@ -167,8 +175,26 @@ def append_log(root: Root, task_id: str, event: dict[str, Any]) -> None:
 
 
 def pending_unit(task: Task) -> Unit | None:
-    """The first unit still pending, or None."""
-    return next((unit for unit in task.units if unit.status == "pending"), None)
+    """The first pending unit whose every need has passed and been integrated, or None."""
+    ready = {unit.id for unit in task.units if unit.status == "passed" and unit.integrated}
+    return next((unit for unit in task.units if unit.status == "pending" and set(unit.needs) <= ready), None)
+
+
+def block_dependents(task: Task) -> list[tuple[Unit, Unit]]:
+    """Mark `blocked` every pending unit that needs a failed, descoped or blocked unit, transitively.
+    Returns each newly blocked unit with the need that blocked it."""
+    by_id = {unit.id: unit for unit in task.units}
+    blocked: list[tuple[Unit, Unit]] = []
+    changed = True
+    while changed:
+        changed = False
+        for unit in task.units:
+            dead = [by_id[n] for n in unit.needs if n in by_id and by_id[n].status in ("failed", "descoped", "blocked")]
+            if unit.status == "pending" and dead:
+                unit.status, unit.summary = "blocked", f"blocked: needs {dead[0].id} ({dead[0].status})"
+                blocked.append((unit, dead[0]))
+                changed = True
+    return blocked
 
 
 def all_verified(task: Task) -> bool:

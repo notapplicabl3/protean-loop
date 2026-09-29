@@ -29,7 +29,7 @@ def test_dry_stuck_ends_interrupted_and_exits_12(capsys: pytest.CaptureFixture[s
 
 def test_an_unknown_scenario_is_a_usage_error(capsys: pytest.CaptureFixture[str]):
     assert cli.main(["dry", "nope"]) == 2
-    assert "unknown scenario 'nope' (known: dry, stuck)" in capsys.readouterr().err
+    assert "unknown scenario 'nope' (known: deps, deps-blocked, deps-broken, dry, stuck)" in capsys.readouterr().err
 
 
 def test_status_on_an_empty_root_says_there_is_no_task(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
@@ -129,3 +129,22 @@ def test_extend_takes_ticks_or_dollars(text: str, parsed: tuple[float, int]):
 def test_extend_refuses_anything_else(text: str):
     with pytest.raises(ValueError):
         cli.parse_extend(text)
+
+
+def test_dry_deps_ends_done_and_runs_the_needed_units_first(capsys: pytest.CaptureFixture[str]):
+    assert cli.main(["dry", "deps"]) == 0
+    lines = capsys.readouterr().out.strip().splitlines()
+    assert [line.split(": ")[1].split(" ")[0] for line in lines if " attempt " in line] == ["u-1", "u-2", "u-3"]
+    assert lines[-1].startswith("terminal: done — 3 unit(s) verified")
+
+
+@pytest.mark.parametrize("scenario, unit_line", [
+    ("deps-broken", "tick 4: u-2 attempt 2: failed (broke u-1 p1)"),
+    ("deps-blocked", "tick 3: u-1 attempt 2: failed (ungradeable p1 p2)"),
+])
+def test_dry_deps_failures_park_on_the_directors_question(scenario: str, unit_line: str,
+                                                          capsys: pytest.CaptureFixture[str]):
+    assert cli.main(["dry", scenario]) == 12
+    lines = capsys.readouterr().out.strip().splitlines()
+    assert any(line.startswith(unit_line) for line in lines), lines
+    assert lines[-1].startswith("terminal: interrupted")

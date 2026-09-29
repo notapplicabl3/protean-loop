@@ -23,6 +23,8 @@ PREDICATE_KINDS: dict[str, tuple[frozenset[str], frozenset[str]]] = {
     "command": (frozenset({"cmd"}), frozenset({"expect_exit"})),
 }
 INT_ARGS = frozenset({"code", "expect_exit"})
+# Kinds that read the tree, so they can be graded again on a later clone; `exit_code` is one worker's evidence.
+RECHECKABLE = frozenset({"file_exists", "file_contains", "command"})
 FILE_BOUND = 262_144
 COMMAND_TIMEOUT = 120
 KILL_DRAIN_SECONDS = 5
@@ -240,13 +242,16 @@ def ungradeable(unit: Unit, note: str) -> Verdict:
     return Verdict(ungradeable_ids=ids, notes={pid: f"{p.kind}: {note}" for pid, p in zip(ids, unit.predicates)})
 
 
-def grade(unit: Unit, clone: Path, exit_code: int | None) -> Verdict:
+def grade(unit: Unit, clone: Path, exit_code: int | None, kinds: frozenset[str] | None = None) -> Verdict:
     """Grade every predicate of `unit` against the clone's checked-out branch and the worker's exit code.
 
-    File kinds read the branch's tree objects; `command` runs sandboxed in the working tree.
+    File kinds read the branch's tree objects; `command` runs sandboxed in the working tree. With
+    `kinds`, only predicates of those kinds are graded, under their own ids.
     """
     verdict = Verdict()
     for pid, predicate in zip(predicate_ids(unit), unit.predicates):
+        if kinds is not None and predicate.kind not in kinds:
+            continue
         problems = _problems(predicate)
         if problems:
             result, note = None, "invalid predicate: " + "; ".join(problems)
