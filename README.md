@@ -41,6 +41,7 @@ fixtures/protean/     the dry scenarios
 tests/protean/        the battery and the shim
 evidence/live-1-2026-09-27/   the first live run: task record, event log, run output (done, 3 ticks, $0.75)
 evidence/live-2-2026-09-27/   the second: parked twice and resumed twice, done in 5 ticks for $2.62
+evidence/live-3-2026-09-29/   the third: three units with needs, the dependent one planned first, done in 5 ticks for $1.51
 ```
 
 The receipts predate two renames: `manager` in them is the director seat, and live-1's brain root was still called `mvp`. Live-2 parked first on the design question the goal demanded, then on a decoder bug (the director's plan arrived one `}` short and the decoder misread it), which was fixed and pinned by a test before the second resume; both answers are in the `-answered` files.
@@ -73,4 +74,4 @@ The renaming was small: the operator's name in the loop's notes, the director pr
 
 ## Status
 
-The rewrite reached `done` on its first two live runs (receipts under `evidence/`; the second needed a decoder fix mid-run); a failed attempt is the one path not yet exercised live. This mirror is re-exported by hand and lags the working repository. **Last updated: 2026-09-28.**
+The rewrite reached `done` on its first three live runs (receipts under `evidence/`; the second needed a decoder fix mid-run; the third ran three units in dependency order with the accepted branch advancing each time); a failed attempt, a blocked unit and a broken retained predicate are the paths not yet exercised live. This mirror is re-exported by hand and lags the working repository. **Last updated: 2026-09-29.**
