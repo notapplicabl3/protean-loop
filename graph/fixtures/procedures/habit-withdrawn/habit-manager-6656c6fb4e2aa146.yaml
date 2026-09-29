@@ -1,0 +1,41 @@
+# The habit an EARLIER sleep run compiled, as `fixtures/traces/habit-withdrawn/` finds it on the
+# root. Byte-identical in shape to what `fixtures/procedures/habit-compiled/` holds — the same
+# compiler wrote both — with the prior run's `sleep_id`, because a habit is withdrawn by the run
+# AFTER the one that compiled it at the earliest.
+#
+# `$source` and `$goal` are the two placeholders a compiled procedure carries: the first is the
+# run directory the compiler read, normalised because it is a temp path; the second is § Resolutions
+# D16-3's own substitution, resolved at match time to the NEW task's goal id, which is what lets a
+# habit compiled in one task fire in another.
+schema_version: 1
+procedure_id: habit-manager-6656c6fb4e2aa146
+name: habit-manager-6656c6fb4e2aa146
+seed: false
+hits_required: 3
+compiled_from:
+  sleep_id: sleep-20260907-000000Z
+  source: $source
+  tasks:
+  - task-earlier
+  - task-fixture
+  refs:
+  - task-earlier:1:cortex:manager:prediction
+  - task-fixture:1:cortex:manager:prediction
+  - task-fixture:3:cortex:manager:prediction
+responses:
+- tier: manager
+  when:
+    goal_digest: 6656c6fb4e2aa146
+  result:
+    emitter: manager
+    interrupt: null
+    units:
+    - id: u-1
+      goal_id: $goal
+      intent: split the maintainer-only tests out of the suite
+      expected: []
+    goals_satisfied: []
+    mismatch_class: null
+    trap_dismissed: []
+    cited_ids: []
+  usage: {}

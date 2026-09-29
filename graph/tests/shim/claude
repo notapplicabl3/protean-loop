@@ -1,0 +1,34 @@
+#!/bin/sh
+# A recording stand-in for the model binary, first on PATH for the whole battery.
+#
+# `the build specification (not in this mirror)` § Deliverable 7 -> *The zero-call proof*: "The battery runs
+# with a recording shim first on PATH that fails loudly and logs any invocation; the run passes
+# only when that log is empty."
+#
+# It is deliberately NOT a mock. It answers nothing, so any code path that reaches it dies here
+# rather than quietly getting a plausible reply -- an invocation is a build failure, not a
+# fallback. Two things happen on every call and both are load-bearing: a line is appended to the
+# log (the durable receipt, readable after the process is gone), and a non-zero exit is
+# returned (the loud half, so the caller cannot continue).
+#
+# The log path is $PROTEAN_SHIM_LOG when set, so a capture can put it in a scratch directory and
+# read its byte count afterwards; otherwise it lands beside this file, where it is impossible to
+# miss. The file staying at ZERO BYTES across a full run is the proof M21 closes on.
+#
+# The exit code is 89: outside every code `protean.config` names (0, 10-13, 20-27), and off any
+# count the prison-smell reporter derives (A.2.i E47 moved it from 97 when that count reached 97), so an
+# invocation can never be mistaken for a terminal state or for one of the five named refusals.
+#
+# This file lives under tests/ and is therefore outside M21's static grep over src/protean/ by
+# construction -- the same shape ruling S-16 uses to put policy citations outside M24.
+
+log="${PROTEAN_SHIM_LOG:-$(dirname "$0")/invocations.log}"
+printf '%s pid=%s cwd=%s argv=%s\n' \
+    "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$$" "$PWD" "$*" >>"$log"
+
+printf '%s\n' \
+    "ZERO-CALL VIOLATION: the recording shim was invoked." \
+    "Build 1 calls no model. Something spawned the binary this shim stands in for." \
+    "  argv: $*" \
+    "  logged to: $log" >&2
+exit 89

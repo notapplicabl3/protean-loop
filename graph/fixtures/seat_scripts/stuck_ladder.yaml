@@ -1,0 +1,130 @@
+# stuck_ladder — the responders that climb unit -> planner -> director and end the task `stuck`.
+#
+# `the build specification (not in this mirror)` § Deliverable 6, *The stuck ladder* (folded: Ruling 16 [B]):
+# rung 1 is always the planner; rung 2 is the same goal item re-planned past the planner's
+# budget with no predicate progress; rung 3 is the director redirecting past its own budget with
+# no goal-stack progress.
+#
+# **No number below is a threshold and no response is keyed by a call index.** The climb is
+# expressed entirely through the escalation the router names, and the router reads every count
+# from `brain/nodes/cortex/weights.yaml` and `brain/nodes/anterior_cingulate/weights.yaml` — the
+# same two files the runtime reads. Retune either file and this script climbs at the new pace
+# without an edit, which is what "scenario and runtime can never disagree about what the
+# threshold is" means in practice.
+#
+# The unit never satisfies its predicate and never moves much: the same expectation fails each
+# time and the same small edit lands, which is the Dislodging signature — a rut, band-aids on a
+# broken bone. That is the signal that hands the unit to the planner.
+
+name: stuck_ladder
+
+responses:
+  # the operator answered the `stuck` interrupt. The answer landed in committed state before this turn
+  # ran, the ladder's counters were reset with it, and the planner acts on it by closing the
+  # goal — which is the whole point of the answer having a landing place.
+  - tier: manager
+    when:
+      escalation: redirect_exhausted
+      resolved: stuck
+    result:
+      emitter: manager
+      goals_satisfied:
+        - $goal
+
+  # The opening call: nothing has been decomposed yet.
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    result:
+      emitter: manager
+      units:
+        - id: u-stuck-1
+          goal_id: $goal
+          intent: reconcile the ledger the goal names
+          expected:
+            - id: e-stuck-1
+              kind: file_exists
+              arguments:
+                path: ledger.reconciled
+      mismatch_class: approach_wrong
+
+  # Rung 1, the trap arm. The planner re-plans the SAME unit id, so its windows accumulate
+  # instead of resetting — which is the only thing that makes the upper rungs reachable at all.
+  # It does not dismiss the detector: this scenario is the one where the signal was right.
+  - tier: manager
+    when:
+      escalation: trap_signal
+      trap: dislodging
+    result:
+      emitter: manager
+      units:
+        - id: u-stuck-1
+          goal_id: $goal
+          intent: reconcile the ledger the goal names, from the other end this time
+          expected:
+            - id: e-stuck-1
+              kind: file_exists
+              arguments:
+                path: ledger.reconciled
+      mismatch_class: approach_wrong
+
+  # The acting call: nothing escalated, so the router falls through to the manager and the
+  # manager dispatches the unit's wave. It restates the unit it is dispatching for — a
+  # `ManagerPlan` is the manager's whole output — and its condition is empty, so it is written
+  # after the two narrower manager responses above.
+  - tier: manager
+    result:
+      emitter: manager
+      units:
+        - id: u-stuck-1
+          goal_id: $goal
+          intent: reconcile the ledger the goal names
+          expected:
+            - id: e-stuck-1
+              kind: file_exists
+              arguments:
+                path: ledger.reconciled
+      wave:
+        - kind: reconciler
+          unit_id: u-stuck-1
+          admitted_ref: admitted
+
+  # The member's return: the same scratch note, over and over, and never the file the
+  # expectation names. That is the rut the Dislodging detector measures — a scripted return
+  # with no process behind it, matched on the member's own kind.
+  - tier: dispatch
+    when:
+      kind: reconciler
+    result:
+      emitter: dispatch
+      unit_id: $unit
+      narrative: re-read the ledger, wrote the same scratch note, produced nothing new
+      observations:
+        - path: scratch.notes
+          exists: true
+          size_bytes: 17
+          content_hash: sha-scratch-a
+      exit_code: 0
+      cited_ids: []
+
+  - tier: director
+    when:
+      escalation: redirect_exhausted
+    result:
+      emitter: director
+      modulators:
+        reward_error: -1.0
+        arousal: 1.0
+        confidence: 0.0
+
+  # Rung 2: the planner has spent its re-plans, so the director redirects the goal itself.
+  - tier: director
+    when:
+      escalation: replan_exhausted
+    result:
+      emitter: director
+      redirect_of: $goal
+      modulators:
+        reward_error: -0.65
+        arousal: 0.7
+        confidence: 0.15

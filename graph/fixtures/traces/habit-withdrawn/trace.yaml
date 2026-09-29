@@ -1,0 +1,48 @@
+# Arm 9: a habit withdrawn.
+#
+# A procedure an earlier sleep run compiled is already on the root, and three habit hits joined
+# to three planner pairs that all graded `matched: false`. § Resolutions D16-7: k is the
+# procedure's OWN `hits_required` — the floor it cleared — and `failed_hits` is the trailing
+# consecutive run, so a habit that started working again is not retired.
+#
+# The file is DELETED, which is what makes un-learning visible in the git diff as well as in the
+# report; the seat step falls back to a live call on the next matching tick. The byte-expected
+# procedure file one tree over is therefore the file as it stood BEFORE this run, and the
+# expectation after it is that the folder is empty.
+
+arm: habit-withdrawn
+about: three consecutive failed hits on a compiled habit — the file is deleted and reported
+
+run:
+  task: task-fixture
+  final_tick: 6
+  terminal: done
+  goal: reconcile the pins and make the suite runnable
+  unit: u-1
+  units:
+    - {id: u-1}
+  pairs:
+    - {kind: manager_horizon, tick: 1, matched: false}
+    - {kind: manager_horizon, tick: 3, matched: false}
+    - {kind: manager_horizon, tick: 5, matched: false}
+  planner_journals: [1, 3, 5]
+
+brain:
+  procedures: [habit-manager-6656c6fb4e2aa146]
+  hits:
+    - {procedure_id: habit-manager-6656c6fb4e2aa146, tick: 1, ref: "task-fixture:1:cortex:manager:prediction", matched_condition: {goal_digest: "6656c6fb4e2aa146"}, avoided_model: claude-opus-5}
+    - {procedure_id: habit-manager-6656c6fb4e2aa146, tick: 3, ref: "task-fixture:3:cortex:manager:prediction", matched_condition: {goal_digest: "6656c6fb4e2aa146"}, avoided_model: claude-opus-5}
+    - {procedure_id: habit-manager-6656c6fb4e2aa146, tick: 5, ref: "task-fixture:5:cortex:manager:prediction", matched_condition: {goal_digest: "6656c6fb4e2aa146"}, avoided_model: claude-opus-5}
+
+claims:
+  pairs: 3
+  admissible: 3
+  applied: []
+  withheld:
+    - {node: cortex, key: k_replan, direction: tighten, because: "two-task rule"}
+    - {node: cortex, key: manager_horizon, direction: tighten, because: "two-task rule"}
+  procedures_written: []
+  procedures_withdrawn: [habit-manager-6656c6fb4e2aa146]
+  procedures_present_after: []
+  files_written:
+    - projects/_root/memory/cortex/learning.jsonl

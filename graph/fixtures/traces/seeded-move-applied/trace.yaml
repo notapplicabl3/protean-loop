@@ -1,0 +1,43 @@
+# Arm 6: a seeded key moved, `was_seeded: true`.
+#
+# `DIGEST:110` [E] — "every seeded record is marked as a seed, so sleep can weaken it" — has no
+# subject until a seeding map names a weights key. A seeded key is marked by MEMBERSHIP in
+# `brain/seeds.yaml` and never by a marker inside `weights.yaml` (§ Resolutions S-10, S-15), so
+# the arm's whole preparation is one seeding row.
+#
+# § Resolutions S-8: a tightening move on a seeded key is row L5's fixture and the k = 3 arm
+# suffices; the withheld LOOSENING seeded move is its own arm, next door.
+
+arm: seeded-move-applied
+about: a key named in the seeding map is moved by sleep, and the update records was_seeded
+
+run:
+  task: task-fixture
+  final_tick: 4
+  terminal: done
+  pairs:
+    - {kind: hippocampus_citation, tick: 1, matched: true}
+    - {kind: hippocampus_citation, tick: 2, matched: false}
+
+brain:
+  seeds: |
+    feedback_retrieval:
+      node: hippocampus
+      key: candidate_window
+      value: 20
+  memory:
+    - {node: hippocampus, task: task-earlier, tick: 1, ref: r-1, signal: hippocampus_citation, matched: true}
+
+claims:
+  pairs: 2
+  admissible: 2
+  applied:
+    - {node: hippocampus, key: candidate_window, from: 20, to: 19, direction: tighten, was_seeded: true}
+    - {node: hippocampus, key: semantic_window, from: 8, to: 7, direction: tighten, was_seeded: false}
+    - {node: hippocampus, key: semantic_min_overlap, from: 0.1, to: 0.11, direction: tighten, was_seeded: false}
+  withheld: []
+  procedures_written: []
+  procedures_withdrawn: []
+  files_written:
+    - nodes/hippocampus/weights.yaml
+    - projects/_root/memory/hippocampus/learning.jsonl

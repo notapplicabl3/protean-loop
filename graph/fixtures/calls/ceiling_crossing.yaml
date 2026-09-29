@@ -1,0 +1,97 @@
+# ceiling_crossing — four cheap calls that cross the token ceiling between the two evaluations.
+#
+# `the build specification (not in this mirror)` § Deliverable 7's two inhibition bullets and § DoD row
+# G8. The tick's ceiling function runs **twice** — once at homeostasis's own step, against the
+# cost as the tick opened, and once at the boundary, against the spend the tick accumulated —
+# and yields **one** stop. This fixture is the case where the second sees what the first could
+# not: four calls, each far below the ceiling, crossing it together.
+#
+# **No call sits on homeostasis.** The tick after the crossing is what proves the suppression
+# half — "a crossed ceiling suppresses every further model call for the rest of the tick while
+# the remaining nodes still run" — and a call planned at homeostasis would be issued at its step
+# *before* its body detected the crossing, which is a call before the crossing and not after it.
+# The four calls sit on the four nodes that follow, so the suppressed tick issues nothing at all
+# and every node of it still runs.
+#
+# The opening manager response mints an `irreversible: true` unit for the same reason
+# `four_cold_calls.yaml` does: the gate vetoes from the second tick on, so the measured ticks
+# make the four planned calls and no seat call, and the four cheap calls are the whole spend.
+#
+# The ceiling itself is not here. `max_tokens` lives in the brain root's own
+# `nodes/homeostasis/weights.yaml`, and the battery writes it into the **throwaway** root it
+# runs against — a fixture that named a number would be a ceiling in two places.
+
+name: ceiling_crossing
+
+calls:
+  - node: hippocampus
+    type: think
+    payload:
+      question: is the retrieval window wide enough for this unit?
+  - node: thalamus
+    type: think
+    payload:
+      question: is the admitted set thin?
+  - node: basal_ganglia
+    type: escalate
+    payload:
+      concern: the unit is irreversible and nothing has authorized it
+      unit_id: u-ceiling-1
+  - node: anterior_cingulate
+    type: escalate
+    payload:
+      concern: the plan has not changed since the veto
+      unit_id: u-ceiling-1
+
+responses:
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    usage:
+      input_tokens: 30
+      cache_creation_input_tokens: 20
+      output_tokens: 10
+      cache_read_input_tokens: 1000
+    result:
+      emitter: manager
+      units:
+        - id: u-ceiling-1
+          goal_id: $goal
+          intent: drop the table the goal names
+          irreversible: true
+          expected:
+            - id: e-ceiling-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+
+  # think — 4 + 1 + 1 = 6 spend tokens. Cheap: no single call of this tick crosses anything.
+  - tier: think
+    usage:
+      input_tokens: 4
+      cache_creation_input_tokens: 1
+      output_tokens: 1
+      cache_read_input_tokens: 7000
+    result:
+      emitter: think
+      answer: wide enough for now
+      confidence: 0.5
+
+  # escalate — 5 + 1 + 2 = 8 spend tokens.
+  - tier: escalate
+    usage:
+      input_tokens: 5
+      cache_creation_input_tokens: 1
+      output_tokens: 2
+      cache_read_input_tokens: 3000
+    result:
+      emitter: escalate
+      answer: hold the unit; nothing has changed
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.5

@@ -1,0 +1,81 @@
+# firing_decline — one think call on the hippocampus, so a declining node's silence is visible.
+#
+# `the build specification (not in this mirror)` § Deliverable 1 and § DoD row G2. The fixture carries no
+# threshold of its own: `firing_threshold` lives in the brain root's own `nodes/*/weights.yaml`,
+# and the battery raises it in the **throwaway** root it runs against — a fixture that named a
+# firing threshold would be that number in two places, and the one place it belongs is the file
+# the sleep graph rewrites.
+#
+# The call sits on the hippocampus because that is the node row G2 declines: a node that skips
+# must issue **none** of the calls a plan named for it, and a plan with no call on that node
+# could not tell "issued nothing" from "was asked for nothing".
+#
+# The manager mints an ordinary, reversible unit: the gate must **fire** on the measured pass —
+# a pending unit is present — and run on its **defined empty input**, which is what a declining
+# thalamus upstream leaves it.
+
+name: firing_decline
+
+calls:
+  - node: hippocampus
+    type: think
+    payload:
+      question: is anything in the window worth ranking?
+
+responses:
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    usage:
+      input_tokens: 41
+      cache_creation_input_tokens: 61
+      output_tokens: 11
+      cache_read_input_tokens: 7001
+    result:
+      emitter: manager
+      units:
+        - id: u-firing-1
+          goal_id: $goal
+          intent: write the note the goal names
+          expected:
+            - id: e-firing-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+
+  - tier: manager
+    usage:
+      input_tokens: 41
+      cache_creation_input_tokens: 61
+      output_tokens: 11
+      cache_read_input_tokens: 7001
+    result:
+      emitter: manager
+      units:
+        - id: u-firing-1
+          goal_id: $goal
+          intent: write the note the goal names
+          expected:
+            - id: e-firing-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+
+  - tier: think
+    usage:
+      input_tokens: 7
+      cache_creation_input_tokens: 11
+      output_tokens: 1
+      cache_read_input_tokens: 7001
+    result:
+      emitter: think
+      answer: nothing in the window is worth ranking
+      confidence: 0.25
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.25

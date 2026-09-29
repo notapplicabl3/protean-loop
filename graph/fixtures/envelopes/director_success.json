@@ -1,0 +1,32 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 1930,
+  "num_turns": 1,
+  "session_id": "seat-director-0001",
+  "stop_reason": "tool_use",
+  "result": "{\"emitter\": \"director\", \"tick\": 5, \"goals_pushed\": [], \"goals_closed\": [], \"constraints\": [{\"kind\": \"path_scope\", \"arguments\": {\"root\": \"workspace\"}, \"set_at_tick\": 5}], \"modulators\": {\"reward_error\": -0.25, \"arousal\": 0.5, \"confidence\": 0.4}, \"redirect_of\": \"g-1\", \"cited_ids\": []}",
+  "modelUsage": {
+    "protean-director-model": {
+      "inputTokens": 640,
+      "outputTokens": 176,
+      "cacheReadInputTokens": 4096,
+      "cacheCreationInputTokens": 0,
+      "costUSD": 0.0
+    },
+    "claude-haiku-overhead": {
+      "inputTokens": 72,
+      "outputTokens": 11,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "costUSD": 0.0
+    }
+  },
+  "usage": {
+    "input_tokens": 640,
+    "output_tokens": 176,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4096
+  }
+}

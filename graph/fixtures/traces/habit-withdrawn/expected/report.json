@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "sleep_id": "sleep-20260908-000000Z",
+  "dry_run": false,
+  "source": {
+    "runs": [
+      {
+        "source": "$source",
+        "task": "task-fixture",
+        "ticks": 6,
+        "terminal": "done",
+        "project": "_root"
+      }
+    ],
+    "seed_hashes": {
+      "nodes/anterior_cingulate/weights.yaml": "$seed:nodes/anterior_cingulate/weights.yaml",
+      "nodes/basal_ganglia/weights.yaml": "$seed:nodes/basal_ganglia/weights.yaml",
+      "nodes/cortex/weights.yaml": "$seed:nodes/cortex/weights.yaml",
+      "nodes/hippocampus/weights.yaml": "$seed:nodes/hippocampus/weights.yaml",
+      "nodes/homeostasis/weights.yaml": "$seed:nodes/homeostasis/weights.yaml",
+      "nodes/thalamus/weights.yaml": "$seed:nodes/thalamus/weights.yaml"
+    },
+    "brain_root": "$brain"
+  },
+  "evidence": {
+    "signals": [
+      {
+        "signal": "manager_horizon",
+        "pairs": 3,
+        "admissible": 3,
+        "matched": 0,
+        "excluded": {
+          "unjoined": 0,
+          "off-list": 0,
+          "ungradeable": 0,
+          "vacuous": 0
+        }
+      }
+    ],
+    "pairs": 3,
+    "admissible": 3,
+    "excluded": {
+      "unjoined": 0,
+      "off-list": 0,
+      "ungradeable": 0,
+      "vacuous": 0
+    }
+  },
+  "weights": {
+    "updates": [
+      {
+        "schema_version": 1,
+        "node": "cortex",
+        "key": "k_replan",
+        "from_value": 3,
+        "to_value": 4,
+        "direction": "tighten",
+        "signal": "manager_horizon",
+        "evidence": {
+          "refs": [
+            "task-fixture:1:cortex:manager:prediction",
+            "task-fixture:3:cortex:manager:prediction",
+            "task-fixture:5:cortex:manager:prediction"
+          ],
+          "tasks": [
+            "task-fixture"
+          ],
+          "projects": [
+            "_root"
+          ],
+          "pairs": 3,
+          "matched": 0,
+          "match_rate": 0.0,
+          "required_pairs": 3,
+          "required_tasks": 2,
+          "confirmations": 0,
+          "every_task_done": null,
+          "floor_minimum": null
+        },
+        "applied": false,
+        "withheld_reason": "two-task rule: the window's evidence spans 1 task(s) (task-fixture), 2 required",
+        "seed_hash": "$seed:nodes/cortex/weights.yaml",
+        "was_seeded": false
+      },
+      {
+        "schema_version": 1,
+        "node": "cortex",
+        "key": "manager_horizon",
+        "from_value": 4,
+        "to_value": 3,
+        "direction": "tighten",
+        "signal": "manager_horizon",
+        "evidence": {
+          "refs": [
+            "task-fixture:1:cortex:manager:prediction",
+            "task-fixture:3:cortex:manager:prediction",
+            "task-fixture:5:cortex:manager:prediction"
+          ],
+          "tasks": [
+            "task-fixture"
+          ],
+          "projects": [
+            "_root"
+          ],
+          "pairs": 3,
+          "matched": 0,
+          "match_rate": 0.0,
+          "required_pairs": 3,
+          "required_tasks": 2,
+          "confirmations": 0,
+          "every_task_done": null,
+          "floor_minimum": null
+        },
+        "applied": false,
+        "withheld_reason": "two-task rule: the window's evidence spans 1 task(s) (task-fixture), 2 required",
+        "seed_hash": "$seed:nodes/cortex/weights.yaml",
+        "was_seeded": false
+      }
+    ]
+  },
+  "procedures": {
+    "written": [],
+    "rejected": [
+      {
+        "procedure_id": "habit-manager-6656c6fb4e2aa146",
+        "tier": "manager",
+        "when": {
+          "goal_digest": "6656c6fb4e2aa146"
+        },
+        "refs": [
+          "task-fixture:1:cortex:manager:prediction",
+          "task-fixture:3:cortex:manager:prediction",
+          "task-fixture:5:cortex:manager:prediction"
+        ],
+        "tasks": [
+          "task-fixture"
+        ],
+        "reason": "outcome not matched: 0/3 admissible pair(s) graded matched, and a habit compiles only from a window that never failed"
+      }
+    ],
+    "withdrawn": [
+      {
+        "procedure_id": "habit-manager-6656c6fb4e2aa146",
+        "path": "nodes/cortex/procedures/habit-manager-6656c6fb4e2aa146.yaml",
+        "failed_hits": 3,
+        "hits_required": 3,
+        "reason": "3 consecutive habit hit(s) graded matched: false, and the habit cleared a floor of 3 — withdrawn, so the seat step falls back to a live call on the next matching tick"
+      }
+    ]
+  },
+  "project_memory": {
+    "records": [
+      {
+        "schema_version": 1,
+        "project": "_root",
+        "node": "cortex",
+        "sleep_id": "sleep-20260908-000000Z",
+        "task": "task-fixture",
+        "tick": 1,
+        "ref": "task-fixture:1:cortex:manager:prediction",
+        "signal": "manager_horizon",
+        "key": null,
+        "matched": false,
+        "admissible": true,
+        "excluded_reason": "",
+        "consumed_by": {}
+      },
+      {
+        "schema_version": 1,
+        "project": "_root",
+        "node": "cortex",
+        "sleep_id": "sleep-20260908-000000Z",
+        "task": "task-fixture",
+        "tick": 3,
+        "ref": "task-fixture:3:cortex:manager:prediction",
+        "signal": "manager_horizon",
+        "key": null,
+        "matched": false,
+        "admissible": true,
+        "excluded_reason": "",
+        "consumed_by": {}
+      },
+      {
+        "schema_version": 1,
+        "project": "_root",
+        "node": "cortex",
+        "sleep_id": "sleep-20260908-000000Z",
+        "task": "task-fixture",
+        "tick": 5,
+        "ref": "task-fixture:5:cortex:manager:prediction",
+        "signal": "manager_horizon",
+        "key": null,
+        "matched": false,
+        "admissible": true,
+        "excluded_reason": "",
+        "consumed_by": {}
+      }
+    ],
+    "summaries": [
+      {
+        "schema_version": 1,
+        "project": "_root",
+        "node": "cortex",
+        "sleep_id": "sleep-20260908-000000Z",
+        "admissible": 3,
+        "matched": 0,
+        "excluded": {
+          "unjoined": 0,
+          "off-list": 0,
+          "ungradeable": 0,
+          "vacuous": 0
+        },
+        "updates": 0,
+        "procedures": 0,
+        "kind": "summary"
+      }
+    ]
+  },
+  "files_written": [
+    "projects/_root/memory/cortex/learning.jsonl"
+  ],
+  "notes": []
+}

@@ -1,0 +1,111 @@
+# vetoed_wave — the gate's `no_go`, and what it inhibits.
+#
+# `the build specification (not in this mirror)` § DoD row G2's veto clause: "a `no_go` inhibits the
+# dispatch wave and **every delegate for the pending unit** while think and escalate stay
+# allowed". The gate's veto is build 1's, contractual and catastrophic-only, and it runs on every
+# tick that has a subject — it never skips.
+#
+# The unit declares `irreversible: true` and no `allow_irreversible` constraint names it, which
+# is one of the gate's two arms. The gate runs **before** the cortex, so the seat call is skipped
+# and no wave is assembled at all; the anterior cingulate's own calls run after it, and the
+# delegate among them is the one the veto reaches — it is not issued, so it makes no call and
+# journals no entry, while the think and the escalate beside it are issued and answered.
+#
+# The `dispatch` response below exists so that the refusal is a **refusal** rather than a missing
+# configuration: if the veto ever stopped inhibiting the wave, this fixture would dispatch rather
+# than fail to find an answer.
+
+name: vetoed_wave
+
+calls:
+  - node: anterior_cingulate
+    type: think
+    payload:
+      question: is this rut worth flagging?
+  - node: anterior_cingulate
+    type: escalate
+    payload:
+      concern: the gate vetoed the unit and the plan has not changed
+      unit_id: u-veto-1
+  - node: anterior_cingulate
+    type: delegate
+    payload:
+      kind: writer
+      question: write the irreversible change anyway
+
+responses:
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    result:
+      emitter: manager
+      units:
+        - id: u-veto-1
+          goal_id: $goal
+          intent: drop the table the goal names
+          irreversible: true
+          expected:
+            - id: e-veto-1
+              kind: file_exists
+              arguments:
+                path: dropped.md
+
+  - tier: manager
+    result:
+      emitter: manager
+      units:
+        - id: u-veto-1
+          goal_id: $goal
+          intent: drop the table the goal names
+          irreversible: true
+          expected:
+            - id: e-veto-1
+              kind: file_exists
+              arguments:
+                path: dropped.md
+      wave:
+        - kind: writer
+          unit_id: u-veto-1
+          admitted_ref: admitted
+
+  - tier: think
+    result:
+      emitter: think
+      answer: it is worth flagging
+      confidence: 0.8
+
+  - tier: escalate
+    result:
+      emitter: escalate
+      answer: re-plan it reversibly
+      proposed: []
+
+  - tier: delegate
+    result:
+      emitter: delegate
+      kind: writer
+      verdict: "no"
+      information: this should never have been asked
+
+  - tier: dispatch
+    when:
+      kind: writer
+    result:
+      emitter: dispatch
+      unit_id: $unit
+      narrative: this wave should never have been dispatched
+      observations:
+        - path: dropped.md
+          exists: true
+          size_bytes: 1
+          content_hash: sha-dropped-a
+      exit_code: 0
+      cited_ids: []
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.5

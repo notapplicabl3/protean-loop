@@ -1,0 +1,58 @@
+# The arm § DoD row L9's derivation clause is re-checked over: all five report groups populated
+# in one run, with real content in every one.
+#
+#   source          — the run read, its terminal, and the six verified seed hashes
+#   evidence        — two signals, an exclusion under its own reason
+#   weights         — an applied update beside a withheld one, each with its floor arithmetic
+#   procedures      — a habit compiled from a window this run and an earlier task share
+#   project_memory  — a pair line per pair per node, plus a summary line per node
+#
+# Two independent windows in one run, which is the point: the hippocampus window holds an
+# unmatched pair and therefore TIGHTENS and applies, while the cortex planner window is all
+# matched and therefore proposes a loosening step it cannot fund — the same discriminator
+# (§ Resolutions D8-4) reading two ways off one trace. The third hippocampus pair is vacuous and
+# is excluded before either window sees it, so the `excluded` map is non-zero without any rule
+# having to be relaxed to make it so.
+
+arm: all-five-groups
+about: every group of the report populated at once — an applied update, a compiled habit, an exclusion
+
+run:
+  task: task-fixture
+  final_tick: 7
+  terminal: done
+  goal: reconcile the pins and make the suite runnable
+  unit: u-1
+  units:
+    - {id: u-1}
+  pairs:
+    - {kind: hippocampus_citation, tick: 1, matched: true}
+    - {kind: hippocampus_citation, tick: 2, matched: false}
+    - {kind: manager_horizon, tick: 3, matched: true}
+    - {kind: manager_horizon, tick: 5, matched: true}
+    - {kind: hippocampus_vacuous, tick: 6, matched: true}
+  planner_journals: [3, 5]
+
+brain:
+  memory:
+    - {node: hippocampus, task: task-earlier, tick: 1, ref: r-1, signal: hippocampus_citation, matched: true}
+    - {node: cortex, task: task-earlier, tick: 1, ref: "task-earlier:1:cortex:manager:prediction", signal: manager_horizon, matched: true}
+
+claims:
+  pairs: 5
+  admissible: 4
+  excluded: {vacuous: 1}
+  applied:
+    - {node: hippocampus, key: candidate_window, from: 20, to: 19, direction: tighten, was_seeded: false}
+    - {node: hippocampus, key: semantic_window, from: 8, to: 7, direction: tighten, was_seeded: false}
+    - {node: hippocampus, key: semantic_min_overlap, from: 0.1, to: 0.11, direction: tighten, was_seeded: false}
+  withheld:
+    - {node: cortex, key: k_replan, direction: loosen, because: "6 required to loosen"}
+    - {node: cortex, key: manager_horizon, direction: loosen, because: "6 required to loosen"}
+  procedures_written: [habit-manager-6656c6fb4e2aa146]
+  procedures_withdrawn: []
+  files_written:
+    - nodes/hippocampus/weights.yaml
+    - nodes/cortex/procedures/habit-manager-6656c6fb4e2aa146.yaml
+    - projects/_root/memory/cortex/learning.jsonl
+    - projects/_root/memory/hippocampus/learning.jsonl

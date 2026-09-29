@@ -1,0 +1,90 @@
+# two_kinds — the `kinds:` container a fixture brain root loads, one kind per class.
+#
+# `the build specification (not in this mirror)` § Deliverable 1, § Out of scope (S-A22): **a fixture
+# kind is not a library kind.** Which kinds exist is build A.2's and the operator holds it, so these two
+# name no work at all — `fixture_one` and `fixture_two` — ship in no seed, reach no live root and
+# live only here. The shipping `brain/seats.yaml` carries both class sub-mappings EMPTY.
+#
+# **The fixture IS the subject** (folded: S-i29): this root exists so that a *loadable* container
+# can be read back — one `dispatch` block, one `delegate` block, their prefixes beside this file,
+# and `tests/cortex/fake_cli.py` as the stand-in binary. Every refusal in § Deliverable 1 is
+# proven by **mutating a loaded payload** in `tests/cortex/test_kinds.py` instead, on
+# `tests/cortex/test_live_config.py`'s landed precedent, rather than by a root per case.
+#
+# `TIER_KEYS` EXACTLY — the ten keys a seat block and a `calls:` block take, not a subset and not
+# a superset. There is deliberately no `class:` key (the class is the sub-mapping), no per-kind
+# `sandbox:`, no workspace key and no writable-path key: each of those refuses at load by name.
+#
+# **The tool lists are the POSITIVE CONTROL of § Deliverable 2's floor** (row G2). Each block grants
+# its class's licensed patterns in full — the `dispatch` kind all fifteen, the `delegate` kind all
+# three — beside the tool NAMES those patterns derive, which is what `--tools` is built from and what
+# makes the patterns bind at all (S-44). The patterns themselves are authored ONCE, in
+# `src/protean/cortex/live/kinds.py` (row M1); these are a seed granting a subset of them, which is
+# the only thing a seed may do.
+#
+# `disallowed_tools` is EMPTY on purpose and is not a hole: the runtime appends the one
+# `EGRESS_REMOTE` literal to every spawn's `--disallowedTools` whatever a block says, so a block is
+# never held to the eight egress verbs and there is no superset refusal for one to fail.
+#
+# `permission_mode` is the one mode that binds on a T3 surface (`PERMISSION_MODE_BINDING`, measured
+# S-44); `add_dir` is true for the `dispatch` kind, whose allowed set includes the task workspace,
+# and false for the `delegate` kind, whose set is the writable trees alone. The two caps sit well
+# below the `runtime.spawn_*` ceilings the seed carries.
+kinds:
+  dispatch:
+    fixture_one:
+      model: claude-fable-5-1
+      effort: high
+      permission_mode: dontAsk
+      allowed_tools:
+        - Read
+        - Edit
+        - Write
+        - Grep
+        - Glob
+        - Bash(uv:*)
+        - Bash(python:*)
+        - Bash(pytest:*)
+        - Bash(git status:*)
+        - Bash(git diff:*)
+        - Bash(git add:*)
+        - Bash(git commit:*)
+        - Bash(git checkout:*)
+        - Bash(git branch:*)
+        - Bash(git log:*)
+      disallowed_tools: []
+      # The six names the fifteen patterns above derive, deliberately NOT in the derivation's own
+      # first-appearance order: the comparison is set equality, so a permuted `tools` loads, and this
+      # fixture is where that is read back (folded: S-i46).
+      tools:
+        - Bash
+        - Read
+        - Edit
+        - Write
+        - Grep
+        - Glob
+      add_dir: true
+      max_call_usd: 1.0
+      timeout_seconds: 60
+      prompt: seats/kinds/fixture_one.md
+
+  delegate:
+    fixture_two:
+      model: claude-fable-5-1
+      effort: high
+      permission_mode: dontAsk
+      allowed_tools:
+        - Read
+        - Grep
+        - Glob
+      disallowed_tools: []
+      # No `Bash` name, and none is derivable: the delegate class licenses no `Bash` pattern at all,
+      # so the class cannot carry the shell in any form (folded: S-i27).
+      tools:
+        - Read
+        - Grep
+        - Glob
+      add_dir: false
+      max_call_usd: 1.0
+      timeout_seconds: 60
+      prompt: seats/kinds/fixture_two.md

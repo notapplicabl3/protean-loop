@@ -1,0 +1,56 @@
+# body_invariance — one recorded state and one tier, replayed through both bodies (row G9).
+#
+# `the build specification (not in this mirror)` § Deliverable 5: "For the same committed state and the
+# same tier, the request bytes handed to the body and the envelope handed back are
+# byte-equivalent across bodies — row G9, proven dry on a recorded state replayed through both
+# body adapters with a **scripted transport standing in for each**."
+#
+# THE TRANSPORT IS SCRIPTED AND NOTHING HERE SPENDS. `tests/cortex/test_bodies.py` installs the
+# stand-in binary (`tests/cortex/fake_cli.py`) once per body, hands it the `result` below to
+# answer with, and drives the SHIPPING adapter against it: the real argv, the real env scrub,
+# the real sandbox wrap, a real process — only the process on the other end is ours. A stand-in
+# binary spawned in place of the real one IS a scripted transport (row G12), and no A.1 fixture
+# creates a tier-three process at all.
+#
+# THE STATE IS THE RECORDED ONE, and it is the fixture's rather than the test's so that "the
+# same state" is one artifact both runs read instead of two literals that happen to agree.
+#
+# The tier is the MANAGER: it is the seat whose request carries the most — a workspace, a goal
+# and an escalation — so the request bytes being byte-identical is a claim about something.
+# The live half of the same claim is the operator's row B32, queued behind their go at B42.
+
+name: body_invariance
+
+# The recorded state both bodies are replayed on.
+state:
+  task: task-body-invariance
+  at: 3
+  escalation: empty_unit_stack
+  goal:
+    id: g-body
+    text: write the note the goal asks for
+  unit:
+    id: u-body
+    intent: write the note the goal asks for
+    expectation:
+      id: e-body
+      kind: file_exists
+      path: notes.md
+
+responses:
+  # The manager's plan, as the scripted transport hands it back — the same bytes for both
+  # bodies, because a body carries bytes and decides nothing.
+  - tier: manager
+    result:
+      emitter: manager
+      units:
+        - id: u-body
+          goal_id: g-body
+          intent: write the note the goal asks for
+          expected:
+            - id: e-body
+              kind: file_exists
+              arguments:
+                path: notes.md
+      goals_satisfied: []
+      cited_ids: []

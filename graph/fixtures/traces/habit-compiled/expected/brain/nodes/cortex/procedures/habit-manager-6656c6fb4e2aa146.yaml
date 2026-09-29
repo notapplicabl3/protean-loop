@@ -1,0 +1,32 @@
+schema_version: 1
+procedure_id: habit-manager-6656c6fb4e2aa146
+name: habit-manager-6656c6fb4e2aa146
+seed: false
+hits_required: 3
+compiled_from:
+  sleep_id: sleep-20260908-000000Z
+  source: $source
+  tasks:
+  - task-earlier
+  - task-fixture
+  refs:
+  - task-earlier:1:cortex:manager:prediction
+  - task-fixture:1:cortex:manager:prediction
+  - task-fixture:3:cortex:manager:prediction
+responses:
+- tier: manager
+  when:
+    goal_digest: 6656c6fb4e2aa146
+  result:
+    emitter: manager
+    interrupt: null
+    units:
+    - id: u-1
+      goal_id: $goal
+      intent: split the maintainer-only tests out of the suite
+      expected: []
+    goals_satisfied: []
+    mismatch_class: null
+    trap_dismissed: []
+    cited_ids: []
+  usage: {}

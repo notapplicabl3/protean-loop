@@ -1,0 +1,107 @@
+# dispatch_wave — the manager's own dispatch wave, two members, for the merge and the keys.
+#
+# `the build specification (not in this mirror)` § Deliverable 4 (a wave is **one call**; its members take
+# `member#` sub-keys assigned in the order the `ManagerPlan` lists them) and § Deliverable 3
+# ("The merge is defined per field"). The wave is what the acting pass does: nothing has
+# escalated, the router falls through to the manager, and the manager dispatches.
+#
+# **Two members, chosen so that every one of the five merge rules has something to merge:**
+#
+#   member 1  writer     notes.md          exit 0   e-1 → "wrote"     cites c-1
+#   member 2  checker    checked.md        exit 3   e-2 → "checked"   cites c-1, c-2
+#
+# so `observations` and `cited_ids` union, `expectation_values` merge per predicate id,
+# `exit_code` is the **worst** of the two, and `narrative` concatenates in `member#` order. The
+# two name **one** unit, because a wave whose members name two is an illegal return rather than
+# a merge — `two_unit_wave.yaml` is that case.
+#
+# **Nothing here spawns.** Each member's return is scripted and has no process behind it, which
+# is what row G12 asserts of every A.1 fixture: a stand-in answer, matched on the member's own
+# `kind`, with no kind block anywhere — the container and its containment are build A.1.i's.
+
+name: dispatch_wave
+
+responses:
+  # The opening call: the unit stack is empty and there is nothing to act on yet.
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    result:
+      emitter: manager
+      units:
+        - id: u-wave-1
+          goal_id: $goal
+          intent: write the note and check it
+          expected:
+            - id: e-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+
+  # The acting call: the manager restates the unit and dispatches its wave. The members are
+  # listed in the order they are handed to the seam, which is the order `member#` is assigned
+  # in — `writer` is member 1 and `checker` member 2, however they are later run.
+  - tier: manager
+    result:
+      emitter: manager
+      units:
+        - id: u-wave-1
+          goal_id: $goal
+          intent: write the note and check it
+          expected:
+            - id: e-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+      wave:
+        - kind: writer
+          unit_id: u-wave-1
+          admitted_ref: admitted
+        - kind: checker
+          unit_id: u-wave-1
+          admitted_ref: admitted
+
+  - tier: dispatch
+    when:
+      kind: writer
+    result:
+      emitter: dispatch
+      unit_id: $unit
+      narrative: wrote the note
+      observations:
+        - path: notes.md
+          exists: true
+          size_bytes: 42
+          content_hash: sha-notes-a
+      exit_code: 0
+      expectation_values:
+        e-1: wrote
+      cited_ids:
+        - c-1
+
+  - tier: dispatch
+    when:
+      kind: checker
+    result:
+      emitter: dispatch
+      unit_id: $unit
+      narrative: checked the note against the ledger
+      observations:
+        - path: checked.md
+          exists: true
+          size_bytes: 11
+          content_hash: sha-checked-a
+      exit_code: 3
+      expectation_values:
+        e-2: checked
+      cited_ids:
+        - c-1
+        - c-2
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.5

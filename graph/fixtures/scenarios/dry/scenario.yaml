@@ -1,0 +1,19 @@
+# The dry scenario: the scripted task `protean dry dry` runs end to end with zero model calls.
+#
+# `the build specification (not in this mirror)` § Deliverable 7 — "a goal, a `SeatScript` responder per tier
+# (request-keyed …), a seeded **throwaway temp workspace** created and destroyed by the fixture
+# … and an expected trace of the climb. Never a real repo; never a live one; no policy file
+# is read, copied or mirrored by any fixture."
+#
+# The goal is deliberately small and file-shaped: one note, written into the workspace, checked
+# on disk. Small because the claim under test is that the CONTRACTS carry a real task end to
+# end, not that the scripted seats are clever — a longer goal would only lengthen the trace.
+#
+# The responders are `plan_and_execute`, named by stem. They are not copied here: a seat script
+# is a reusable set of request-keyed responders and a scenario is one goal plus the name of the
+# script it drives, which is exactly what lets this scenario reuse the one the ladder scenario's
+# sibling already hand-authored. Nothing below states a count, a threshold or a turn index.
+
+name: dry
+goal: write the run's note into the workspace and confirm it is on disk
+seat_script: plan_and_execute

@@ -1,0 +1,27 @@
+# Thalamus — the most load-bearing node: what the seat is allowed to see this tick.
+#
+# Admission is a signal, not a filter: `AdmittedContext` carries what was excluded and why,
+# so the exclusion stays visible to the seat that would otherwise never know it happened.
+max_admitted: 12
+min_relevance: 0.0
+
+# The per-kind quota, build 2 (S-16): a sub-quota INSIDE `max_admitted`, never beside it, so a
+# store of seeded chunks can never crowd this task's own episodes out of the seat's context —
+# nor the reverse. A guess until the first run measures it on `cited_ids` (§ Named assumptions 9).
+semantic_max_admitted: 4
+
+# Conditional firing, build A.1 (`the build specification (not in this mirror)` § Deliverable 1). The
+# node's cheap check fires — the node does its work — when its score is **>= this number**, so
+# **raising** it makes the node skip more. Seeded at zero: A.1 lands the mechanism and the
+# default is that every node works exactly as it did before, which is the only seed under which
+# "conditional firing" adds a capability rather than silently subtracting one. The offline sleep
+# graph is its only writer, on `firing_check`'s own strict loosening arm.
+firing_threshold: 0.0
+
+# The summary bound, build A.3 (`the build specification (not in this mirror)` § Deliverable 3). Each
+# admitted chunk's summary is bounded to the integer part of this many characters and marked
+# where cut; an uncut summary carries no mark, an episode's summary is still its id, and with
+# the key absent every summary is whole. A float, so sleep's tenth-step moves it — an integer
+# would move one character per step. Above the one measured citation (~5 KB) and under the
+# largest measured section (28 KB); a guess until a run measures it on `cited_ids`.
+max_summary_chars: 7000.0

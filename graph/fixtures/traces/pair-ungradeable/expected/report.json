@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "sleep_id": "sleep-20260908-000000Z",
+  "dry_run": false,
+  "source": {
+    "runs": [
+      {
+        "source": "$source",
+        "task": "task-fixture",
+        "ticks": 3,
+        "terminal": "done",
+        "project": "_root"
+      }
+    ],
+    "seed_hashes": {
+      "nodes/anterior_cingulate/weights.yaml": "$seed:nodes/anterior_cingulate/weights.yaml",
+      "nodes/basal_ganglia/weights.yaml": "$seed:nodes/basal_ganglia/weights.yaml",
+      "nodes/cortex/weights.yaml": "$seed:nodes/cortex/weights.yaml",
+      "nodes/hippocampus/weights.yaml": "$seed:nodes/hippocampus/weights.yaml",
+      "nodes/homeostasis/weights.yaml": "$seed:nodes/homeostasis/weights.yaml",
+      "nodes/thalamus/weights.yaml": "$seed:nodes/thalamus/weights.yaml"
+    },
+    "brain_root": "$brain"
+  },
+  "evidence": {
+    "signals": [
+      {
+        "signal": "dispatch_expectations",
+        "pairs": 1,
+        "admissible": 0,
+        "matched": 0,
+        "excluded": {
+          "unjoined": 0,
+          "off-list": 0,
+          "ungradeable": 1,
+          "vacuous": 0
+        }
+      }
+    ],
+    "pairs": 1,
+    "admissible": 0,
+    "excluded": {
+      "unjoined": 0,
+      "off-list": 0,
+      "ungradeable": 1,
+      "vacuous": 0
+    }
+  },
+  "weights": {
+    "updates": []
+  },
+  "procedures": {
+    "written": [],
+    "rejected": [],
+    "withdrawn": []
+  },
+  "project_memory": {
+    "records": [
+      {
+        "schema_version": 1,
+        "project": "_root",
+        "node": "cortex",
+        "sleep_id": "sleep-20260908-000000Z",
+        "task": "task-fixture",
+        "tick": 2,
+        "ref": "task-fixture:2:cortex:dispatch:prediction",
+        "signal": "dispatch_expectations",
+        "key": null,
+        "matched": false,
+        "admissible": false,
+        "excluded_reason": "ungradeable",
+        "consumed_by": {}
+      }
+    ],
+    "summaries": [
+      {
+        "schema_version": 1,
+        "project": "_root",
+        "node": "cortex",
+        "sleep_id": "sleep-20260908-000000Z",
+        "admissible": 0,
+        "matched": 0,
+        "excluded": {
+          "unjoined": 0,
+          "off-list": 0,
+          "ungradeable": 1,
+          "vacuous": 0
+        },
+        "updates": 0,
+        "procedures": 0,
+        "kind": "summary"
+      }
+    ]
+  },
+  "files_written": [
+    "projects/_root/memory/cortex/learning.jsonl"
+  ],
+  "notes": []
+}

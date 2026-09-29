@@ -1,0 +1,2 @@
+{"schema_version":1,"task":"task-run-2","tick":1,"tier":"manager","ref":"task-run-2:1:cortex:manager:prediction","procedure_id":"habit-manager-6656c6fb4e2aa146","matched_condition":{"goal_digest":"6656c6fb4e2aa146"},"avoided_model":"claude-opus-5"}
+{"schema_version":1,"task":"task-run-2","tick":4,"tier":"manager","ref":"task-run-2:4:cortex:manager:prediction","procedure_id":"habit-manager-6656c6fb4e2aa146","matched_condition":{"goal_digest":"6656c6fb4e2aa146"},"avoided_model":"claude-opus-5"}

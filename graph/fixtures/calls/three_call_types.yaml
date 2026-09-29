@@ -1,0 +1,90 @@
+# three_call_types — the scripted transport every later leg's call fixtures start from.
+#
+# `the build specification (not in this mirror)` § Deliverable 2: think, escalate and delegate are three
+# *callers* of the one `(addressee, request) -> SeatEnvelope`, so this file answers **all four
+# call types beside the two seats** and the runtime decodes every one of them on the single
+# `decode_seat_result()` path. A response's `tier:` key carries the addressee it answers for.
+#
+# **The `calls:` plan is what makes a node's step reach the cortex.** Nothing in `src/` decides
+# that a node calls: which edges exist is A.2's (§ Directional decisions 5) and the cheap check
+# that gates a node's own work is order W6's, so the plan lives here, in the fixture, and the
+# desk issues exactly it. Three nodes, one call type each, so one tick exercises all three.
+#
+# **The delegate and dispatch answers are scripted returns with no process behind them** — no
+# A.1 fixture creates a tier-three process at all (row G12), and order W8 extends them for the
+# wave. There is deliberately **no** manager response for the non-escalated acting tick: that
+# response is order W8's, and a fixture that answered it here would hide the red the interim
+# battery is supposed to show (folded: D3-8).
+
+name: three_call_types
+
+responses:
+  # The opening seat call: the unit stack is empty and there is nothing to act on yet.
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    result:
+      emitter: manager
+      units:
+        - id: u-calls-1
+          goal_id: $goal
+          intent: write the note the goal asks for
+          expected:
+            - id: e-calls-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.5
+
+  # think — an answer the calling node folds into its own output as a signal.
+  - tier: think
+    result:
+      emitter: think
+      answer: the ceiling is far off and the last three ticks were cheap
+      confidence: 0.6
+
+  # escalate — the manager's reply. It may propose members; it authorizes nothing.
+  - tier: escalate
+    result:
+      emitter: escalate
+      answer: keep admitting; the unit is still the right one
+
+  # delegate — information or a verdict, and no observation field at all (Option A).
+  - tier: delegate
+    result:
+      emitter: delegate
+      kind: reviewer
+      verdict: the retrieval window is wide enough
+      information: nothing in the last three episodes contradicts the unit
+
+  # dispatch — the manager's own wave return, scripted. **Order W8 assembles the wave**; this
+  # response exists so the scripted layer answers all four call types (row M3).
+  - tier: dispatch
+    result:
+      emitter: dispatch
+      unit_id: u-calls-1
+      narrative: scripted dispatch return, nothing behind it
+
+calls:
+  - node: homeostasis
+    type: think
+    payload:
+      question: is this tick's spend near the ceiling?
+      context: the tick's own counters
+  - node: hippocampus
+    type: delegate
+    payload:
+      kind: reviewer
+      question: does anything retrieved contradict the open unit?
+  - node: thalamus
+    type: escalate
+    payload:
+      concern: the admitted set looks thin for this unit
+      proposal: widen the window, or re-plan

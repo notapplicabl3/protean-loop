@@ -1,0 +1,31 @@
+# Arm 3: an update withheld by the two-task rule.
+#
+# Three admissible pairs — k is satisfied — but every one of them is this run's own, so the
+# window spans one task. This is the arm project memory exists to satisfy: without a store that
+# survives a task, no update could ever apply, and with one that ignored the task boundary a
+# single run could move a threshold three times over.
+
+arm: update-withheld-two-task
+about: three admissible pairs, one task — k clears and the two-task rule does not
+
+run:
+  task: task-fixture
+  final_tick: 4
+  terminal: done
+  pairs:
+    - {kind: hippocampus_citation, tick: 1, matched: true}
+    - {kind: hippocampus_citation, tick: 2, matched: true}
+    - {kind: hippocampus_citation, tick: 3, matched: false}
+
+claims:
+  pairs: 3
+  admissible: 3
+  applied: []
+  withheld:
+    - {node: hippocampus, key: candidate_window, direction: tighten, because: "two-task rule"}
+    - {node: hippocampus, key: semantic_window, direction: tighten, because: "two-task rule"}
+    - {node: hippocampus, key: semantic_min_overlap, direction: tighten, because: "two-task rule"}
+  procedures_written: []
+  procedures_withdrawn: []
+  files_written:
+    - projects/_root/memory/hippocampus/learning.jsonl

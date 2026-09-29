@@ -1,0 +1,18 @@
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.venv/
+.DS_Store
+protean.lock
+# brain/ — the seed tree (NODE.md, weights.yaml, procedures/) is tracked; generated runtime state is not
+brain/state/
+brain/episodes/
+brain/projects/
+brain/mailbox/open/
+brain/mailbox/orphaned/
+brain/nodes/*/trace.jsonl
+brain/semantic/
+brain/archive/
+brain/intake/*
+!brain/intake/manifest.yaml
+reports/

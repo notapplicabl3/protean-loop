@@ -1,0 +1,277 @@
+{
+ "measured_by": "tests/cortex/probe_profile.py",
+ "spends": "nothing — `claude --version` and a /bin/sh stand-in, both under sandbox-exec",
+ "sandbox_binary": "/usr/bin/sandbox-exec",
+ "claude_binary": "~/.local/share/claude/versions/2.1.269",
+ "claude_version_unsandboxed": {
+  "exit_status": 0,
+  "stdout": "2.1.269 (Claude Code)",
+  "stderr": ""
+ },
+ "profile_head_retained": "(version 1)(allow default)",
+ "spawn_writable_seed": [
+  "/tmp"
+ ],
+ "spawn_writable_seed_resolved": [
+  "/private/tmp"
+ ],
+ "environment_names": [
+  "HOME",
+  "LANG",
+  "PATH",
+  "TERM",
+  "USER"
+ ],
+ "tmpdir_of_the_parent": "/tmp/",
+ "controlling_tty": "",
+ "directories": {
+  "evidence": "/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence",
+  "third": "/private/tmp/protean-spawn-profile-probe-6lqpj194/third",
+  "cwd": "/private/tmp/protean-spawn-profile-probe-6lqpj194/cwd"
+ },
+ "trials": [
+  {
+   "rung": "no device literal at all",
+   "allowances": [],
+   "profile": "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\"))",
+   "claude_version": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\"))",
+     "~/.local/share/claude/versions/2.1.269",
+     "--version"
+    ],
+    "exit_status": 0,
+    "stdout": "2.1.269 (Claude Code)",
+    "stderr": ""
+   },
+   "stand_in": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\"))",
+     "/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence/protean-fake-seat-cli",
+     "--print",
+     "probe"
+    ],
+    "exit_status": 0,
+    "stdout": "",
+    "stderr": "/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence/protean-fake-seat-cli: line 9: /dev/null: Operation not permitted\n/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence/protean-fake-seat-cli: line 53: /dev/null: Operation not permitted",
+    "wrote_its_evidence_files": true
+   },
+   "write_inside_the_allowed_set": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\"))",
+     "/bin/sh",
+     "-c",
+     "echo ok > /private/tmp/protean-spawn-profile-probe-6lqpj194/evidence/allowed.txt"
+    ],
+    "exit_status": 0,
+    "stdout": "",
+    "stderr": "",
+    "path": "/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence/allowed.txt",
+    "exists_afterwards": true
+   },
+   "shell_redirect_to_dev_null": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\"))",
+     "/bin/sh",
+     "-c",
+     "echo hi 2>/dev/null && echo ok >/dev/null && echo done > /private/tmp/protean-spawn-profile-probe-6lqpj194/evidence/redirect.txt"
+    ],
+    "exit_status": 1,
+    "stdout": "",
+    "stderr": "/bin/sh: /dev/null: Operation not permitted",
+    "marker_written": false
+   },
+   "interpreter_write_to_dev_null": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\"))",
+     "/usr/bin/python3",
+     "-c",
+     "open('/dev/null','w').write('x')"
+    ],
+    "exit_status": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nPermissionError: [Errno 1] Operation not permitted: '/dev/null'"
+   },
+   "write_outside_the_allowed_set": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\"))",
+     "/bin/sh",
+     "-c",
+     "echo no > /private/tmp/protean-spawn-profile-probe-6lqpj194/third/refused.txt"
+    ],
+    "exit_status": 1,
+    "stdout": "",
+    "stderr": "/bin/sh: /private/tmp/protean-spawn-profile-probe-6lqpj194/third/refused.txt: Operation not permitted",
+    "path": "/private/tmp/protean-spawn-profile-probe-6lqpj194/third/refused.txt",
+    "exists_afterwards": false,
+    "refused": true
+   },
+   "passes": false
+  },
+  {
+   "rung": "/dev/null",
+   "allowances": [
+    {
+     "path": "/dev/null",
+     "device": true
+    }
+   ],
+   "profile": "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\") (literal \"/dev/null\"))",
+   "claude_version": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\") (literal \"/dev/null\"))",
+     "~/.local/share/claude/versions/2.1.269",
+     "--version"
+    ],
+    "exit_status": 0,
+    "stdout": "2.1.269 (Claude Code)",
+    "stderr": ""
+   },
+   "stand_in": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\") (literal \"/dev/null\"))",
+     "/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence/protean-fake-seat-cli",
+     "--print",
+     "probe"
+    ],
+    "exit_status": 0,
+    "stdout": "",
+    "stderr": "",
+    "wrote_its_evidence_files": true
+   },
+   "write_inside_the_allowed_set": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\") (literal \"/dev/null\"))",
+     "/bin/sh",
+     "-c",
+     "echo ok > /private/tmp/protean-spawn-profile-probe-6lqpj194/evidence/allowed.txt"
+    ],
+    "exit_status": 0,
+    "stdout": "",
+    "stderr": "",
+    "path": "/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence/allowed.txt",
+    "exists_afterwards": true
+   },
+   "shell_redirect_to_dev_null": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\") (literal \"/dev/null\"))",
+     "/bin/sh",
+     "-c",
+     "echo hi 2>/dev/null && echo ok >/dev/null && echo done > /private/tmp/protean-spawn-profile-probe-6lqpj194/evidence/redirect.txt"
+    ],
+    "exit_status": 0,
+    "stdout": "hi",
+    "stderr": "",
+    "marker_written": true
+   },
+   "interpreter_write_to_dev_null": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\") (literal \"/dev/null\"))",
+     "/usr/bin/python3",
+     "-c",
+     "open('/dev/null','w').write('x')"
+    ],
+    "exit_status": 0,
+    "stdout": "",
+    "stderr": ""
+   },
+   "write_outside_the_allowed_set": {
+    "argv": [
+     "/usr/bin/sandbox-exec",
+     "-p",
+     "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\") (literal \"/dev/null\"))",
+     "/bin/sh",
+     "-c",
+     "echo no > /private/tmp/protean-spawn-profile-probe-6lqpj194/third/refused.txt"
+    ],
+    "exit_status": 1,
+    "stdout": "",
+    "stderr": "/bin/sh: /private/tmp/protean-spawn-profile-probe-6lqpj194/third/refused.txt: Operation not permitted",
+    "path": "/private/tmp/protean-spawn-profile-probe-6lqpj194/third/refused.txt",
+    "exists_afterwards": false,
+    "refused": true
+   },
+   "passes": true
+  }
+ ],
+ "measured_allowances": [
+  {
+   "path": "/dev/null",
+   "device": true
+  }
+ ],
+ "measured_profile": "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\") (literal \"/dev/null\"))",
+ "measured_rung": "/dev/null",
+ "interpreter": {
+  "uv": "~/.local/bin/uv",
+  "uv_version": {
+   "argv": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\") (literal \"/dev/null\"))",
+    "~/.local/bin/uv",
+    "--version"
+   ],
+   "exit_status": 0,
+   "stdout": "uv 0.11.29 (901092ee1 2026-07-15 aarch64-apple-darwin)",
+   "stderr": ""
+  },
+  "uv_run_offline": {
+   "argv": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\") (literal \"/dev/null\"))",
+    "~/.local/bin/uv",
+    "run",
+    "--offline",
+    "python",
+    "-c",
+    "print('ok')"
+   ],
+   "exit_status": 2,
+   "stdout": "",
+   "stderr": "error: Failed to initialize cache at `~/.cache/uv`\n  Caused by: failed to open file `~/.cache/uv/sdists-v9/.git`: Operation not permitted (os error 1)"
+  },
+  "uv_cache_dir": "~/.cache/uv",
+  "uv_cache_dir_resolved": "~/.cache/uv",
+  "uv_run_offline_with_cache_allowed": {
+   "argv": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\") (subpath \"~/.cache/uv\") (literal \"/dev/null\"))",
+    "~/.local/bin/uv",
+    "run",
+    "--offline",
+    "python",
+    "-c",
+    "print('ok')"
+   ],
+   "exit_status": 0,
+   "stdout": "ok",
+   "stderr": ""
+  },
+  "profile_with_cache_allowed": "(version 1)(allow default)(deny file-write*)(allow file-write* (subpath \"/private/tmp/protean-spawn-profile-probe-6lqpj194/evidence\") (subpath \"/private/tmp\") (subpath \"~/.cache/uv\") (literal \"/dev/null\"))"
+ }
+}

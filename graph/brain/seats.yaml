@@ -1,0 +1,478 @@
+# brain/seats.yaml — the whole of build 2's model configuration.
+#
+# `the build specification (not in this mirror)` § Deliverable 1: the seat is CONFIGURATION, not code
+# (§ Directional decisions 9). Model id, effort, permission mode, the tool lists, `add_dir`, the
+# two per-call caps and each tier's prefix file live here, hand-authored, and are hashed into
+# the checkpoint like every other seed — so editing this file mid-task is a drift refusal and
+# re-making the model choice on build 2's own numbers is a seed edit under `resume --reseed`.
+#
+# The containment below is a T3 contract, not a default (§ Directional decisions 19, the operator-ruled,
+# folded: S-26): the positive allow-list, the explicit disallowed egress set, the five-variable
+# environment and the `PATH` that cannot resolve the seat binary are what stand between an
+# autonomous tool-bearing session and the rest of this machine. Widening any of them is the operator's
+# ruling. Narrowing one is a seed edit.
+#
+# Order W6 adds an `oracle:` block beside these three, taking the executor's containment whole.
+
+# `live` runs the real seats; `scripted` runs build 1's hand-authored ones. A brain root with no
+# seats.yaml at all — every test root, and the copy `protean dry` makes — is scripted, which is
+# how `protean dry` keeps working with no flag and no second factory.
+layer: live
+
+runtime:
+  # Resolved by name from the PARENT's PATH, once, and spawned by absolute path. Unpinned by
+  # named exception (§ Rulings 16): the seam is the subscription and the subscription is this
+  # binary. The mitigation ships in its place — the resolved version on every call.
+  binary: claude
+
+  # THE BODY, and it is ONE key for the whole file (`the build specification (not in this mirror)`
+  # § Deliverable 5, row G13, folded: S-A78). `print` is the `claude -p` body; `terminal` is a
+  # live interactive session THE RUNTIME LAUNCHES — the operator attaches to it, never the reverse, and a
+  # body the runtime did not launch is refused by name before any session handle is minted.
+  #
+  # It applies to the TWO CORTEX SEATS ONLY. The two `calls:` blocks below and every subagent run
+  # under `claude -p` whatever this says; tier three always does. A `body` key ANYWHERE ELSE in
+  # this file — on a tier block, on a `calls:` block, on `oracle:`, or on anything build A.1.i
+  # adds — is refused at load by name: a body selectable per call is a body that could differ per
+  # call, which is the one thing "the body never changes the result" cannot survive.
+  #
+  # `print` is the default and the only value this build has a wire receipt for. The live half of
+  # the terminal body is the operator's row B32, queued behind their go at B42; the argv it would add is
+  # deliberately empty until then (§ Named assumptions 1).
+  body: print
+
+  # The child's PATH, and it EXCLUDES the directory holding the binary above, so a nested call
+  # from inside a session fails as command-not-found (folded: S-31). The loader enforces the
+  # exclusion rather than trusting this list, because the binary moves between machines.
+  path:
+    - /opt/homebrew/bin
+    - /usr/bin
+    - /bin
+    - /usr/sbin
+    - /sbin
+
+  # The oracle's allow-list names `Bash(uv:*)`, and on this machine `uv` lives in the same
+  # directory as the seat binary. Naming the executables one at a time is strictly narrower than
+  # putting that directory back on PATH: one name exposes one executable, never a directory's
+  # worth. What is refused at load is a link that resolves to the seat binary ITSELF, under any
+  # name; sharing the binary's directory is not disqualifying, which is exactly why the `uv`
+  # entry below loads. So this can never become the hole it exists to avoid.
+  bin_links:
+    - uv
+
+  # The whole environment a seat process inherits. No RIG_*, no PROTEAN_*, no ANTHROPIC_* — so
+  # the credentials the workload's own rig reads from the maintainer's environment never reach a
+  # session (folded: S-31). HOME stays because the subscription credential resolves through it,
+  # which is why `--setting-sources ""` is the isolation lever and `--bare` is not.
+  #
+  # USER is the fifth and it is RULED, not defaulted (folded: S-37): under the four alone the
+  # CLI answers `Not logged in · Please run /login` before it reaches the API, and delta-debugging
+  # the parent's environment gave a minimal sufficient addition of exactly this one variable
+  # (measured, dispatch-5 ledger D5-8). A username carries no secret and no path, so the T3
+  # reading is untouched. The loader refuses a SIXTH name: widening is the operator's, never a seed edit.
+  env_passthrough:
+    - PATH
+    - HOME
+    - LANG
+    - TERM
+    - USER
+
+  # THE FOUR SPAWN BOUNDS, all static and all here rather than on `manager:`
+  # (`the build specification (not in this mirror)` § Deliverable 5, A1-6). A tier block's shape is the
+  # ten TIER_KEYS, so a bound written there would be tolerated by accident rather than required by
+  # the loader — and a bound the loader cannot require is not a bound. All four are in
+  # RUNTIME_KEYS: a seed missing one does not load.
+  #
+  # WHAT THEY BOUND IS CONFIGURED CAPS, NOT SPEND. They are ceilings over the caps a seed wrote,
+  # checked before the first member spawns, and `--max-budget-usd` was measured to stop the NEXT
+  # turn rather than the turn in flight — so a member may overshoot its own cap by at most one turn,
+  # and a wave its ceiling by at most one turn per member. What the overshoot meets after the fact
+  # is witness rather than prevention: it lands on the receipt's `usage` and homeostasis counts the
+  # call as it counts every call.
+  #
+  # The first two are the ceilings a KIND BLOCK's own `max_call_usd` and `timeout_seconds` are
+  # refused above at load (the former executor's figures, S-A47). The last two are the wave's: the
+  # widest wave that may start, and the SUM of one wave's members' effective caps — the sum, because
+  # members may carry different kinds with different caps and `members × one cap` describes no wave
+  # that exists. Both wave numbers are THE OPERATOR'S ROWS B45 and B46; delegates are not members and count
+  # against neither.
+  spawn_max_call_usd: 5.0
+  spawn_timeout_seconds: 1800
+  max_wave_members: 4
+  spawn_max_wave_usd: 10.0
+
+  # THE PER-TICK DELEGATE BOUND (`the build specification (not in this mirror)` § Deliverable 1, row B66): how
+  # many `delegate` calls the outer nodes may plan in one tick, all of them together. It is applied
+  # WHEN THE PLAN IS MADE, in NODE_ORDER: the runtime's call policy plans delegates node by node
+  # until the tick's running count reaches this number, and a delegate past it is simply NOT
+  # PLANNED — no call, no journal entry, no refusal — so a replay plans exactly the delegates its
+  # torn pass did. `0` plans none. It is a non-negative integer and in RUNTIME_KEYS: a seed missing
+  # it, or carrying a float, a bool, a negative or a string, does not load.
+  #
+  # It bounds how many delegates are planned, not what one spends: each is still capped by its own
+  # kind block under the two spawn ceilings above, and delegates still count against neither wave
+  # bound.
+  max_tick_delegates: 1
+
+  # THE TREES A SPAWN MAY WRITE OUTSIDE THE TASK WORKSPACE — a list of paths beside the four bounds,
+  # and not a bound (§ Deliverable 5, folded: S-i20). A spawn's sandbox profile is INVERTED: it
+  # denies `file-write*` outright and allows it back under named subpaths only — the task workspace
+  # for a `dispatch` kind, these trees for both classes, and nothing else. So a tree nobody listed
+  # here is unwritable by construction rather than by anyone remembering to deny it.
+  #
+  # Every entry is resolved (`~`/`/`) and REQUIRED TO EXIST at load, because a tree the profile
+  # would allow and the machine does not have is a hole authored by typo; and an entry resolving
+  # INSIDE any `sandbox.deny_write` tree below refuses at load, because the inverted profile carries
+  # no deny clause to win that collision back — an allowed subpath nested in a denied tree simply
+  # grants the write this seed said no to.
+  #
+  # `/tmp` is the temp root the child falls back to: TMPDIR is not one of the five names above, so
+  # the CLI and Python find no per-user temp directory and use this one. It is machine-shared, which
+  # is what the receipt's fourth audit list exists to witness.
+  #
+  # `~/.cache/uv` is a NAMED ENTRY and it is MEASURED, not assumed (`tests/cortex/probe_profile.py`,
+  # capture `tests/cortex/captures/spawn-profile.json`): under the composed profile without it,
+  # `uv run --offline` exits 2 with `Failed to initialize cache at '~/.cache/uv' …
+  # Operation not permitted`, and with it — and nothing else added — exits 0. `uv cache dir` printed
+  # `~/.cache/uv` on this machine, recorded here rather than derived at load so a
+  # spawn's allowed write set stays readable off the seed. A `dispatch` kind is licensed
+  # `Bash(uv:*)`, so denying the cache denies the tool. ITS REACH IS THE OPERATOR'S ROW B51: uv's cache is
+  # shared mutable state every later `uv run` on this machine executes from, so a spawn licensed to
+  # write it could change what a subsequent run of the operator's own tooling executes.
+  spawn_writable:
+    - /tmp
+    - ~/.cache/uv
+
+# ------------------------------------------------------------------------------------------
+# The sandbox — the containment's kernel half (S-45, measured 2026-09-07)
+# ------------------------------------------------------------------------------------------
+#
+# Beside `runtime:` rather than inside it, because it governs the `oracle:` block below as much
+# as the three tiers, and the oracle sits beside `runtime:` too.
+#
+# § Named assumptions 10 said the T3 surfaces are contained by "an allow-list, an env scrub and a
+# post-run hash audit, **not** by a sandbox … detection plus narrowing, not prevention". S-45
+# replaces that with prevention: every seat and every measured session is spawned under
+# `sandbox-exec`, whose profile denies `file-write*` under the trees named here. A session that
+# reaches for one gets `Operation not permitted` from the kernel, before the audit ever runs; the
+# audit stays, as the second reading of the same fact.
+#
+# `deny_write` entries are LOGICAL, resolved at load time, never trusted as written:
+#   * an entry beginning with `~` or `/` is a path, `~` expanding to `HOME`;
+#   * a bare word is one of the two names the loader knows — `brain_root`, this seed's own root,
+#     and `policy_home`, resolved through the one module licensed to know where it is
+#     (`src/protean/intake/policy_home.py`). Anything else refuses by name at load.
+# The third tree is a logical name for exactly that reason: naming it here would put a policy-home
+# path under `brain/`, which row W4's grep forbids.
+#
+# `process-exec` is deliberately NOT denied: the deny reaches the sandboxed launch itself and
+# nothing runs at all (measured, 2026-09-07). Adding it is not a narrowing, it is a break.
+sandbox:
+  # Absolute, like the seat binary: the child's PATH cannot resolve it and does not need to.
+  binary: /usr/bin/sandbox-exec
+  deny_write:
+    - "~/workload"
+    - brain_root
+    - policy_home
+
+# ------------------------------------------------------------------------------------------
+# The two seats (§ Deliverable 1's table; folded: A1-1, folded: A1-2, folded: S-5)
+# ------------------------------------------------------------------------------------------
+#
+# **Two seats from build A.1** (`the build specification (not in this mirror)` § Deliverable 3): director
+# and manager. The `executor:` block is DELETED — tier three is a specialized subagent library
+# the manager dispatches, not a seat: it takes no tier, no block here and no session handle, and
+# its per-kind configuration is the `kinds:` container below. `TIER_KEYS` is required per tier at
+# load, so a tier without a block refuses; `config.TIERS` and the blocks below move together or
+# nothing loads. The `calls:` mapping (think and escalate) and `runtime.body` arrive with orders
+# W3 and W9.
+#
+# `max_call_usd` is a STATIC per-call ceiling and no dollar figure is derived from homeostasis,
+# whose token, wall and error ceilings stay the task-level stop. The first wet row measured what
+# the cap does at its edge: it bounds the NEXT turn, not the current one, and at the cap the CLI
+# returns an envelope with no `result` at all — decision 11's shape, so the adapter raises
+# `SeatUnavailable` there rather than trying to decode it. `timeout_seconds` is therefore the
+# bound that actually holds a single call: the adapter kills the process and refuses by name.
+
+director:
+  model: claude-fable-5-1
+  effort: high
+  # No tools, so no permission mode to grant: the flag is omitted entirely.
+  permission_mode: null
+  allowed_tools: []
+  # `--tools ""` is PROVEN on this seat and ships (S-6, D3-4, dispatch-5 ledger D5-9). The first
+  # wet row's probe 3 was refused at the API on a 21 kB FILLER prefix; re-probed once with the
+  # real prefix below and a real DirectorRequest on stdin, the same flag returned a structured
+  # result — `stop_reason: tool_use`, `subtype: success`, a `result` that validates as
+  # `DirectorDirection`. Capture: `tests/cortex/captures/tools-flag-probe.json`.
+  #
+  # The S-6 fallback, if this is ever reversed, is `tools: null` with every acting tool named
+  # here: Bash · Edit · Write · NotebookEdit · Task · KillShell · BashOutput · WebFetch ·
+  # WebSearch · Bash(curl:*) · Bash(wget:*) · Bash(git push:*) · Bash(git remote:*) ·
+  # Bash(git fetch:*) · Bash(git pull:*).
+  disallowed_tools: []
+  tools: ""
+  add_dir: false
+  max_call_usd: 1.0
+  timeout_seconds: 300
+  prompt: seats/director.md
+
+manager:
+  model: claude-opus-5
+  effort: high
+  permission_mode: null
+  allowed_tools: []
+  # Probed in the same pass and on the same flag as the director above: a structured
+  # `ManagerPlan` carrying one well-formed unit. See that block's note for the fallback.
+  disallowed_tools: []
+  tools: ""
+  add_dir: false
+  # The manager's two caps are the figures a `calls:` block must be STRICTLY below (order W3).
+  max_call_usd: 2.0
+  timeout_seconds: 600
+  prompt: seats/manager.md
+
+# ------------------------------------------------------------------------------------------
+# The two call-type blocks (`the build specification (not in this mirror)` § Deliverable 2, row G10)
+# ------------------------------------------------------------------------------------------
+#
+# EXACTLY `think` and `escalate`, and no third block. Those two configure a model call; the
+# other two call types configure nothing at all here, because a spawn's whole process comes
+# from a kind block under `kinds:` below. A `calls:` key naming anything else refuses at load.
+#
+# Each block takes `TIER_KEYS` EXACTLY — the same ten keys a seat block takes, not a subset and
+# not a superset — so the containment the two seats run under resolves for these two unchanged:
+# the absolute-path spawn, the five-name environment built from empty, the PATH that cannot
+# resolve the seat binary, and the `sandbox-exec` wrapper. Nothing here declares a containment
+# of its own; it inherits `runtime:` and `sandbox:` above, exactly as the seats do.
+#
+# TOOL-LESS BY LOAD-TIME REFUSAL, not by convention: `tools: ""` and `add_dir: false` are the
+# only values these two keys may take in this mapping, refused by name if either moves. A node
+# asking a short question decides nothing about the workspace, so there is nothing for it to
+# reach a tool for — and `Task` is absent from the resolved tool set for the same reason the
+# seats' is: the runtime is the only thing that spawns.
+#
+# "TOKEN CHEAP" IS A CONFIGURATION FACT, NOT AN INTENTION (digest §2.8, folded: S-A47). Both
+# caps must be STRICTLY BELOW the manager's $2.00 / 600s, and the loader refuses a configuration
+# in which either is not. That rule reaches these two blocks and nothing else: a spawn is not a
+# cheap advisory call and measuring one against the conductor's budget is the wrong comparison.
+#
+# The model and effort are the director's proven pair (`claude-fable-5-1` at `high`), which is
+# the cheap seat of the two and the only effort value this repo has a wire receipt for
+# (`tests/cortex/captures/tools-flag-probe.json`). The caps are what make the call cheap.
+calls:
+  think:
+    model: claude-fable-5-1
+    effort: high
+    permission_mode: null
+    allowed_tools: []
+    disallowed_tools: []
+    tools: ""
+    add_dir: false
+    max_call_usd: 0.25
+    timeout_seconds: 120
+    prompt: seats/calls/think.md
+
+  escalate:
+    model: claude-fable-5-1
+    effort: high
+    permission_mode: null
+    allowed_tools: []
+    disallowed_tools: []
+    tools: ""
+    add_dir: false
+    max_call_usd: 0.25
+    timeout_seconds: 120
+    prompt: seats/calls/escalate.md
+
+# ------------------------------------------------------------------------------------------
+# The kind container (`the build specification (not in this mirror)` § Deliverable 1, row G1)
+# ------------------------------------------------------------------------------------------
+#
+# ONE SUB-MAPPING PER CLASS, and THE CLASS IS THE SUB-MAPPING rather than a key on the block: a
+# kind that may write is one the seed author had to put under `dispatch:`, which is what makes
+# that reading enforceable at load instead of only at return. The two class names are
+# `config.KIND_CLASSES`, derived as the two call types that carry no `calls:` block above, and
+# the keys are compared as a SET, so either spelling loads. A block outside the two sub-mappings,
+# an unknown class name and a `class:` key on a block each refuse at load by name.
+#
+# BOTH SUB-MAPPINGS ARE PRESENT, and the container itself may not be absent — eager like `calls:`
+# and `sandbox:`, for their reason: a containment surface that is simply missing is a floor
+# authored by omission. The library is two kinds, one per class — `editor` under `dispatch:` and
+# `reader` under `delegate:` (`the build specification (not in this mirror)` § Deliverables 1–3) — and
+# each one's prefix lives under `seats/kinds/`, beside the directory's `.gitkeep`.
+#
+# Each block takes `TIER_KEYS` EXACTLY — the same ten keys a seat block and a `calls:` block take
+# — so it declares no containment of its own and inherits `runtime:` and the single top-level
+# `sandbox:` exactly as the seats do: there is no per-kind `sandbox:`, no workspace key and no
+# writable-path key, because a per-kind containment declaration is a widening vector. `prompt:`
+# resolves under `seats/kinds/` BY REALPATH and the file must exist, so `..`, an absolute path and
+# a symlink whose target leaves the directory each refuse by name. The reason is the hash set:
+# every file a prefix is assembled from is hashed into the checkpoint, and a prompt resolved
+# outside the hashed tree could change under a task with no drift refusal to catch it.
+#
+# A KIND IS A SEED, so admitting one mid-task is a drift refusal — the property the refusal exists
+# for rather than a defect: A.2's library grows between tasks, under `resume --reseed` or on a
+# fresh task.
+kinds:
+  dispatch:
+    editor:
+      model: claude-opus-5
+      effort: high
+      permission_mode: dontAsk
+      allowed_tools:
+        - Read
+        - Edit
+        - Write
+        - Grep
+        - Glob
+        - Bash(uv:*)
+        - Bash(git status:*)
+        - Bash(git diff:*)
+        - Bash(git add:*)
+        - Bash(git commit:*)
+        - Bash(git checkout:*)
+        - Bash(git branch:*)
+      disallowed_tools: []
+      # a YAML list: the comma form is the argv spelling (config.tools_argument), never the seed's
+      tools:
+        - Read
+        - Edit
+        - Write
+        - Grep
+        - Glob
+        - Bash
+      add_dir: true
+      max_call_usd: 2.50
+      timeout_seconds: 1800
+      prompt: seats/kinds/editor.md
+  delegate:
+    reader:
+      model: claude-fable-5-1
+      effort: high
+      permission_mode: dontAsk
+      allowed_tools:
+        - Read
+        - Grep
+        - Glob
+      disallowed_tools: []
+      tools:
+        - Read
+        - Grep
+        - Glob
+      add_dir: true
+      max_call_usd: 0.50
+      timeout_seconds: 300
+      prompt: seats/kinds/reader.md
+
+# ------------------------------------------------------------------------------------------
+# The oracle — the SECOND T3 surface (§ Deliverable 4, § Directional decisions 19, folded: S-34)
+# ------------------------------------------------------------------------------------------
+#
+# The synthetic dev is NOT a seat: it takes no tier, it never enters `seat_calls.jsonl`, and it
+# is spawned by `src/protean/oracle/`, the second of the two packages licensed to name the
+# binary (decision 4, folded: S-1). What it shares with the executor above is the CONTAINMENT,
+# and it takes that whole rather than re-deriving it — the same positive allow-list, the same
+# explicit egress refusals, the same five-name environment and the same PATH that cannot resolve
+# the seat binary. Widening any of them here is the operator's ruling, exactly as it is up there.
+#
+# The block is self-contained rather than inheriting from `runtime:` because the oracle's PATH
+# and link farm are NOT identical to the executor's: `rig.cli open` shells out to `postman`, so
+# the oracle names it and the executor does not. Inheriting would have made that one difference
+# invisible; copying makes the whole surface reviewable in one place.
+oracle:
+  # Q4's ruling, unchanged: Opus 5 at high effort, measured not tasted (§ Rulings 12).
+  model: claude-opus-5
+  effort: high
+
+  # The synthetic dev acts — it reads, edits and runs commands on its own fresh clone — so it
+  # carries a permission mode, exactly as the executor does: `dontAsk`, for the reason the
+  # executor's block states (S-44). The two T3 surfaces bind the same way or neither does.
+  permission_mode: dontAsk
+
+  # The executor's positive list, copied whole, plus `Bash(postman:*)`: `rig it` is one of the
+  # four canonical tasks and the rig's backend runner shells to the `postman` CLI. Note the
+  # absences as much as the entries — no `Bash(git push:*)`, no bare `Bash`, no `Task`.
+  #
+  # MEASURED, 2026-09-07 (dispatch-14 ledger D14-8): under `permission_mode: auto` this list did
+  # NOT bind. The first captured session ran thirteen tool uses outside it — `ls`, `cat`, `head`,
+  # `which`, `find`, `sed`, `export`, plus `ToolSearch` and `Monitor` — with
+  # `permission_denials: []`. RULED and re-measured (S-44, S-45): `dontAsk` beside the explicit
+  # `tools:` set below makes it bind, every unlisted call is denied and named in
+  # `permission_denials`, and the kernel-level `sandbox:` deny is the second layer under it. The
+  # list itself is unchanged — this narrowed how it is enforced, not what it names.
+  allowed_tools:
+    - Read
+    - Edit
+    - Write
+    - Grep
+    - Glob
+    - Bash(uv:*)
+    - Bash(python:*)
+    - Bash(pytest:*)
+    - Bash(postman:*)
+    - Bash(git status:*)
+    - Bash(git diff:*)
+    - Bash(git add:*)
+    - Bash(git commit:*)
+    - Bash(git checkout:*)
+    - Bash(git branch:*)
+    - Bash(git log:*)
+
+  # The egress and remote set, named explicitly beside the allow-list rather than left implicit
+  # in its absence (folded: S-30). The clone has no remote at all (decision 17), so these refuse
+  # a second time what the clone already cannot do.
+  disallowed_tools:
+    - WebFetch
+    - WebSearch
+    - Bash(curl:*)
+    - Bash(wget:*)
+    - Bash(git push:*)
+    - Bash(git remote:*)
+    - Bash(git fetch:*)
+    - Bash(git pull:*)
+
+  # The tool SET, the executor's own, taken whole and in the same order (S-44): it is what makes
+  # the allow-list above bind, and a measured session may reach for nothing else.
+  tools:
+    - Bash
+    - Read
+    - Edit
+    - Write
+    - Grep
+    - Glob
+
+  # The child's PATH, and it EXCLUDES the directory holding the binary, so a nested `claude`
+  # call from inside a measured session fails as command-not-found (folded: S-31). The loader
+  # enforces the exclusion rather than trusting this list.
+  path:
+    - /opt/homebrew/bin
+    - /usr/bin
+    - /bin
+    - /usr/sbin
+    - /sbin
+
+  # Named one executable at a time, strictly narrower than putting a directory back on PATH.
+  # `uv` because it shares a directory with the seat binary and every session provisions with
+  # `uv sync --offline`; `postman` because `rig it` needs it and a missing one would be recorded
+  # as the task's reason rather than measured.
+  bin_links:
+    - uv
+    - postman
+
+  # The whole environment a measured session inherits — five names, no more (folded: S-31,
+  # folded: S-37). No RIG_*: the credential-free frontier is exactly what `rig it`'s predicate
+  # measures, so leaking one would delete the task.
+  env_passthrough:
+    - PATH
+    - HOME
+    - LANG
+    - TERM
+    - USER
+
+  # Bounded twice, like every live call (folded: S-32). 900s is the wall cap on one measured
+  # session — long enough for `uv sync --offline` plus a full suite run, short enough that a
+  # session that has lost the thread is killed rather than left to spend. $3.00 is the per-session
+  # ceiling; 24 sessions is the full pre-change run.
+  timeout_seconds: 900
+  max_call_usd: 3.00

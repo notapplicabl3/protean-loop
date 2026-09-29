@@ -1,0 +1,52 @@
+# missing_prefix — the one refusal whose subject is a file that is NOT there.
+#
+# `the build specification (not in this mirror)` § Deliverable 1 and § Resolutions A1-8: a kind block's
+# `prompt:` is required to **exist** at load. That is the one case a mutated payload cannot make
+# honestly — every other refusal in § Deliverable 1 is proven by mutating a loaded payload, but
+# "the prefix file is not on disk" is a fact about the root rather than about the document, so it
+# gets a root of its own (folded: S-i29).
+#
+# Its granted pair is `two_kinds.yaml`'s, unchanged, so § Deliverable 2's floor passes here and the
+# ONE refusal this root is the subject of is the one it is named for.
+#
+# The block below is `two_kinds.yaml`'s `dispatch` block with one key changed: `prompt:` names a
+# file this directory deliberately does not carry, so no `*.md` copied into `seats/kinds/` can
+# satisfy it. The path is still INSIDE `seats/kinds/` — the confinement refusals (`..`, an
+# absolute path, a symlink whose target leaves) are payload mutations in
+# `tests/cortex/test_kinds.py`, and this root isolates existence alone.
+kinds:
+  dispatch:
+    fixture_one:
+      model: claude-fable-5-1
+      effort: high
+      permission_mode: dontAsk
+      allowed_tools:
+        - Read
+        - Edit
+        - Write
+        - Grep
+        - Glob
+        - Bash(uv:*)
+        - Bash(python:*)
+        - Bash(pytest:*)
+        - Bash(git status:*)
+        - Bash(git diff:*)
+        - Bash(git add:*)
+        - Bash(git commit:*)
+        - Bash(git checkout:*)
+        - Bash(git branch:*)
+        - Bash(git log:*)
+      disallowed_tools: []
+      tools:
+        - Bash
+        - Read
+        - Edit
+        - Write
+        - Grep
+        - Glob
+      add_dir: true
+      max_call_usd: 1.0
+      timeout_seconds: 60
+      prompt: seats/kinds/no_prefix_ships_under_this_name.md
+
+  delegate: {}

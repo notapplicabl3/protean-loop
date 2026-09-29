@@ -1,0 +1,103 @@
+# plan_and_execute — the seat script a scripted run falls back to when nothing names one.
+#
+# `the build specification (not in this mirror)` § Deliverable 6: a seat script is `tier -> ordered queue of
+# responses`, each optionally conditioned on fields of the incoming request, and the responder
+# takes the FIRST response whose condition matches. It is never a turn list: no response below
+# is keyed by a call index or by a cycle number, and none of them restates a threshold — the
+# escalation the router computed already carries the fact that one fired, and the router reads
+# every count from the weights files the runtime reads.
+#
+# `$goal` is the goal id the runtime minted at task start and `$unit` the id this planner
+# minted; both are filled from the incoming request, because a hand-authored file cannot know
+# an id that is minted at run time.
+#
+# The shape: plan one unit, do it, close the goal.
+
+name: plan_and_execute
+
+responses:
+  # The unit came back passing, so the planner has nothing left to decompose and closes the
+  # goal. It is first because its condition is the narrower one — the router names the unit it
+  # just graded, and the opening call names none.
+  - tier: manager
+    when:
+      unit_id: u-1
+    result:
+      emitter: manager
+      goals_satisfied:
+        - $goal
+
+  # The opening call: the unit stack is empty and there is nothing to act on yet.
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    result:
+      emitter: manager
+      units:
+        - id: u-1
+          goal_id: $goal
+          intent: write the note the goal asks for
+          expected:
+            - id: e-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+
+  # The acting call: nothing has escalated, so the router falls through to the manager and the
+  # manager assembles the unit's dispatch wave. It carries no escalation and names no unit —
+  # `escalation: null` is the fall-through — so its condition is empty and it is written LAST,
+  # after the two narrower ones above.
+  #
+  # The manager restates the unit it is dispatching for and names the wave beside it: a
+  # `ManagerPlan` is the manager's whole output, and the manager is the planner grown a
+  # dispatching hand rather than the executor grown a planning one.
+  #
+  # The wave is one member: the work of one unit, done by one subagent kind. `admitted_ref`
+  # points at the context the thalamus admitted, which the runtime resolves; a hand-authored
+  # file names the reference and never a path, because a member request that CAN name a
+  # directory is one a later build has to defend.
+  - tier: manager
+    result:
+      emitter: manager
+      units:
+        - id: u-1
+          goal_id: $goal
+          intent: write the note the goal asks for
+          expected:
+            - id: e-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+      wave:
+        - kind: writer
+          unit_id: u-1
+          admitted_ref: admitted
+
+  # The member's own return: what it observed in the workspace after the work, not what it
+  # asserts. It is a scripted return with **no process behind it** — no kind is spawned by any
+  # A.1 fixture — and it is matched on the member's `kind`, which is the one thing that tells
+  # two members of one wave apart.
+  - tier: dispatch
+    when:
+      kind: writer
+    result:
+      emitter: dispatch
+      unit_id: $unit
+      narrative: wrote the note and observed it on disk
+      observations:
+        - path: notes.md
+          exists: true
+          size_bytes: 42
+          content_hash: sha-notes-a
+      exit_code: 0
+      cited_ids: []
+
+  # The director is never routed to on this path; the response exists so that a run which does
+  # reach it gets a direction rather than an unmatched-response refusal.
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.45

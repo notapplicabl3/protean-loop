@@ -1,0 +1,30 @@
+# Arm 10: an ungradeable pair excluded.
+#
+# Run 1's own shape: an executor verdict resting on one predicate the summary carries an
+# observation for and one `exit_code` predicate with no `code` argument, which order W1 WITHHELD
+# from the verdict rather than failing by absence. At least one withheld beside at least one
+# graded is § Resolutions D5-2's `ungradeable` class, disjoint by construction from `vacuous`.
+#
+# This is the arm that ties § Build process's legs 1 and 5 together: the archived three-tick
+# repeat does not compile into a habit BECAUSE its driving predicates classify here.
+
+arm: pair-ungradeable
+about: a verdict resting partly on a withheld predicate — excluded before any rule sees it
+
+run:
+  task: task-fixture
+  final_tick: 3
+  terminal: done
+  pairs:
+    - {kind: executor_ungradeable, tick: 2, matched: false, unit: u-branch}
+
+claims:
+  pairs: 1
+  admissible: 0
+  excluded: {ungradeable: 1}
+  applied: []
+  withheld: []
+  procedures_written: []
+  procedures_withdrawn: []
+  files_written:
+    - projects/_root/memory/cortex/learning.jsonl

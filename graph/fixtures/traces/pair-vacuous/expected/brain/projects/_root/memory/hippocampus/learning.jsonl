@@ -1,0 +1,2 @@
+{"schema_version":1,"project":"_root","node":"hippocampus","sleep_id":"sleep-20260908-000000Z","task":"task-fixture","tick":1,"ref":"task-fixture:1:hippocampus:-:prediction","signal":"hippocampus_citation","key":null,"matched":true,"admissible":false,"excluded_reason":"vacuous","consumed_by":{}}
+{"schema_version":1,"project":"_root","node":"hippocampus","sleep_id":"sleep-20260908-000000Z","admissible":0,"matched":0,"excluded":{"unjoined":0,"off-list":0,"ungradeable":0,"vacuous":1},"updates":0,"procedures":0,"kind":"summary"}

@@ -1,0 +1,41 @@
+# Arm 7: a loosening seeded move, withheld (§ Resolutions S-8's second half).
+#
+# The seeding row of arm 6 with a window in which every pair matched. `was_seeded` is the
+# orthogonal fact — any applied move on a seeded key weakens the seed — and `direction` is the
+# numeric-risk axis, so the two compose: this is a seeded key whose proposed move is a loosening
+# one, held back by the six-pair floor rather than by anything about the seed.
+#
+# It is the arm that keeps a seeded prior from being the easiest number in the tree to relax.
+
+arm: seeded-loosening-withheld
+about: a seeded key whose window proposes a loosening step, withheld by the six-pair floor
+
+run:
+  task: task-fixture
+  final_tick: 4
+  terminal: done
+  pairs:
+    - {kind: hippocampus_citation, tick: 1, matched: true}
+    - {kind: hippocampus_citation, tick: 2, matched: true}
+
+brain:
+  seeds: |
+    feedback_retrieval:
+      node: hippocampus
+      key: candidate_window
+      value: 20
+  memory:
+    - {node: hippocampus, task: task-earlier, tick: 1, ref: r-1, signal: hippocampus_citation, matched: true}
+
+claims:
+  pairs: 2
+  admissible: 2
+  applied: []
+  withheld:
+    - {node: hippocampus, key: candidate_window, direction: loosen, because: "6 required to loosen", was_seeded: true}
+    - {node: hippocampus, key: semantic_window, direction: loosen, because: "6 required to loosen", was_seeded: false}
+    - {node: hippocampus, key: semantic_min_overlap, direction: loosen, because: "6 required to loosen", was_seeded: false}
+  procedures_written: []
+  procedures_withdrawn: []
+  files_written:
+    - projects/_root/memory/hippocampus/learning.jsonl

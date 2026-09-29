@@ -1,0 +1,37 @@
+# The expected climb of `protean dry dry`, hand-authored against the seat router's own rules
+# and read back by `tests/dry/test_scripted_task.py`.
+#
+# **Position is the pass.** The list is ordered and its index is the loop pass it describes, so
+# nothing here is indexed by number: what is written down is the SHAPE of the climb, never a
+# count, never a threshold, never a turn index. A re-tuned weights file therefore cannot
+# silently desynchronise this file from the run.
+#
+# The shape, in prose. The opening pass finds no plan, so the router hands the loop to the
+# manager with no unit to name, and the manager emits one. The unit is then acted on by the
+# **manager's own dispatch wave**, which the router reaches through the fall-through arm while
+# naming no unit at all — the unit stack belongs to the runtime, not to the compressed workspace
+# the router reads, and tier three is not a seat the router can select. The wave's member comes
+# back matching the declared expectation, which is the workspace's only signal that there is
+# nothing left to act on, so the manager is called a second time — this time NAMING the unit it
+# just graded — and closes the goal it opened. An empty goal stack is `done`.
+#
+# `wave` says whether that pass dispatched one, because a wave is a call and a call is a journal
+# entry: a pass journals one entry per node plus one per call it made. It is a yes/no and never
+# a count — the members are the seat script's, and no number belongs in this file.
+
+name: dry
+terminal: done
+
+climb:
+  - tier: manager
+    escalation: empty_unit_stack
+    unit: null
+    wave: false
+  - tier: manager
+    escalation: null
+    unit: null
+    wave: true
+  - tier: manager
+    escalation: empty_unit_stack
+    unit: u-1
+    wave: false

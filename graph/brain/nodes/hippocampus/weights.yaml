@@ -1,0 +1,29 @@
+# Hippocampus — retrieval, and the composer of the previous tick's episode record.
+#
+# `candidate_window` is § Deliverable 2's named key: how many of THIS task's `episodes.jsonl`
+# records the runtime's boundary loader projects onto `HippocampusInput`. Cross-task episodes
+# are build 3's, so the window is task-local by construction and not by a filter here.
+candidate_window: 20
+recency_weight: 0.5
+min_score: 0.0
+
+# The semantic half, build 2 (S-25): both are keys here rather than fields on the input model,
+# so `## Reads` gains exactly one name and no threshold enters a node module.
+#
+# `semantic_window` sizes the boundary loader's slice of `brain/semantic/*.jsonl` the way
+# `candidate_window` sizes the episode slice — a runtime narrowing, not a filter in the node.
+# `semantic_min_overlap` is the chunk's OWN floor: overlap is the fraction of the live goal and
+# unit vocabulary a chunk carries, in [0, 1], so it shares no scale with `min_score` and the two
+# kinds are never ranked against each other (S-16). Both numbers are guesses until the first run
+# measures them on `cited_ids` (§ Named assumptions 9); the window is the real narrowing and the
+# floor is a noise guard, which is why it is seeded low.
+semantic_window: 8
+semantic_min_overlap: 0.1
+
+# Conditional firing, build A.1 (`the build specification (not in this mirror)` § Deliverable 1). The
+# node's cheap check fires — the node does its work — when its score is **>= this number**, so
+# **raising** it makes the node skip more. Seeded at zero: A.1 lands the mechanism and the
+# default is that every node works exactly as it did before, which is the only seed under which
+# "conditional firing" adds a capability rather than silently subtracting one. The offline sleep
+# graph is its only writer, on `firing_check`'s own strict loosening arm.
+firing_threshold: 0.0

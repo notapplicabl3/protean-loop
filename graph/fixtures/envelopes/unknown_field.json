@@ -1,0 +1,9 @@
+{
+  "stop_reason": "tool_use",
+  "result": "{\"emitter\": \"executor\", \"tick\": 1, \"unit_id\": \"u-1\", \"narrative\": \"minimal\"}",
+  "modelUsage": {
+    "claude-haiku-overhead": {"inputTokens": 10, "outputTokens": 2}
+  },
+  "usage": {"cache_read_input_tokens": 0},
+  "a_field_this_model_has_never_seen": {"nested": ["and", "preserved"]}
+}

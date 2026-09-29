@@ -1,0 +1,33 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 4210,
+  "num_turns": 2,
+  "session_id": "seat-executor-0001",
+  "stop_reason": "tool_use",
+  "result": "{\"emitter\": \"executor\", \"tick\": 3, \"unit_id\": \"u-1\", \"narrative\": \"created the file the unit asked for\", \"observations\": [{\"path\": \"notes.md\", \"exists\": true, \"size_bytes\": 42, \"content_hash\": \"c1a1\"}], \"exit_code\": 0, \"expectation_values\": {\"e-1\": true}, \"cited_ids\": [\"a-1\"]}",
+  "modelUsage": {
+    "protean-executor-model": {
+      "inputTokens": 1804,
+      "outputTokens": 412,
+      "cacheReadInputTokens": 12288,
+      "cacheCreationInputTokens": 0,
+      "costUSD": 0.0
+    },
+    "claude-haiku-overhead": {
+      "inputTokens": 96,
+      "outputTokens": 18,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "costUSD": 0.0
+    }
+  },
+  "usage": {
+    "input_tokens": 1804,
+    "output_tokens": 412,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 12288,
+    "service_tier": "standard"
+  }
+}

@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling==1.32.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "protean"
+version = "0.1.0"
+description = "PROTEAN — an adaptive six-node runtime with live cortex seats, kind-based workers, offline learning, and a scripted dry path."
+requires-python = ">=3.13"
+dependencies = [
+    "pydantic==2.13.5",
+    "PyYAML==6.0.3",
+]
+
+[project.scripts]
+protean = "protean.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/protean"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# The mirrored tests/ tree is a package rooted at the repo, so the default
+# `prepend` import mode would put tests/ on sys.path ahead of the repo root.
+# importlib keeps `import protean` resolving to the installed package and
+# `tests.state.prison_smell` importable as a module for the reflection reporter.
+addopts = "--import-mode=importlib --strict-markers -m 'not live'"
+consider_namespace_packages = true
+pythonpath = ["."]
+markers = [
+    "live: spawns the model binary and spends real money (build 2, the first wet row); deselected by the default addopts, selected only by naming `-m live`",
+    "slow: any test a durations profile (reports/tests/) shows over ~10 s — none today; `-m 'not slow'` is the fast lane and `-m slow` its complement, a bare `uv run pytest` runs both, and `live` stays deselected under either (tests/conftest.py)",
+]

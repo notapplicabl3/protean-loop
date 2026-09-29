@@ -1,0 +1,34 @@
+# Arm 4: an update withheld by the loosening arm.
+#
+# The same three-pair, two-task window as arm 1 with every pair MATCHED, so § Resolutions D8-4's
+# discriminator — `match_rate == 1.0` — proposes the loosening step instead, and the floor
+# doubles to six. A learner that relaxed a threshold on the same evidence that tightens one would
+# be a ratchet in whichever direction the last run happened to point.
+
+arm: update-withheld-loosening
+about: every pair matched, so the step loosens — and three pairs are no longer enough
+
+run:
+  task: task-fixture
+  final_tick: 4
+  terminal: done
+  pairs:
+    - {kind: hippocampus_citation, tick: 1, matched: true}
+    - {kind: hippocampus_citation, tick: 2, matched: true}
+
+brain:
+  memory:
+    - {node: hippocampus, task: task-earlier, tick: 1, ref: r-1, signal: hippocampus_citation, matched: true}
+
+claims:
+  pairs: 2
+  admissible: 2
+  applied: []
+  withheld:
+    - {node: hippocampus, key: candidate_window, direction: loosen, because: "6 required to loosen"}
+    - {node: hippocampus, key: semantic_window, direction: loosen, because: "6 required to loosen"}
+    - {node: hippocampus, key: semantic_min_overlap, direction: loosen, because: "6 required to loosen"}
+  procedures_written: []
+  procedures_withdrawn: []
+  files_written:
+    - projects/_root/memory/hippocampus/learning.jsonl

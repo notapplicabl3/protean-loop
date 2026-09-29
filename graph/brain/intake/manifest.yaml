@@ -1,0 +1,42 @@
+# Seam contract S3 — the map from a logical source to the store it seeds.
+#
+# `the build specification (not in this mirror)` § Deliverable 3. One row per logical source, each with its
+# store, its shape and its declared granularity (folded: S-22).
+#
+# **This file names no path.** A `source` here is a logical name; the one module licensed to turn
+# it into files is `src/protean/intake/policy_home.py`, and that split is what keeps the whole tracked
+# tree — this seed included — free of a policy-home path.
+#
+# A hand-authored seed, like every `NODE.md` and `weights.yaml`: it is hashed into the checkpoint
+# through the widened seed-hash ladder, so an intake that ran between two ticks is refused rather
+# than silently adopted.
+schema_version: 1
+
+sources:
+  # Per markdown heading: the routed policy documents, each a long file of `##` sections.
+  - source: docs
+    store: docs
+    shape: markdown_sections
+    granularity: heading
+
+  # Per row: the project router, entering as the project-memory index and nothing else — the
+  # thalamus-routing half of that mapping is deferred to build 3 (folded: S-9).
+  - source: projects
+    store: projects
+    shape: registry_rows
+    granularity: row
+
+  # Per file: a feedback memory has no heading, so the file is the chunk (folded: S-22).
+  - source: feedback
+    store: feedback
+    shape: frontmatter_document
+    granularity: file
+
+  # Per file, and only the project under task: `protean intake --project <slug>` selects which
+  # project memories enter, each chunk carrying `project: <slug>` (folded: S-12). With no slug
+  # this source contributes nothing and its store is written empty.
+  - source: memory
+    store: memory
+    shape: frontmatter_document
+    granularity: file
+    project_scoped: true

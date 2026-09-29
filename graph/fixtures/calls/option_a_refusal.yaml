@@ -1,0 +1,92 @@
+# option_a_refusal — Option A made mechanical: the call type × shape table, and its positive
+# control.
+#
+# `the build specification (not in this mirror)` § Deliverable 3 ("The manager is the sole conductor of
+# the workspace": an outer node's delegate return that claims a workspace change is **refused by
+# name**, not absorbed) and § Deliverable 4's legal-return table, checked **before** the decoder
+# and after the one unchanged decode retry.
+#
+# **The positive control is the delegate response below**: an `ExecutorSummary`-shaped return —
+# a unit id, a narrative and workspace observations — arriving on a **delegate**. A shape-only
+# check would pass it, because it is a perfectly legal `ExecutorSummary`; the table refuses it
+# because `delegate` may return a `DelegateReturn` and nothing else. It earns **no retry**: a
+# legal shape at the wrong addressee is not a decode failure.
+#
+# Beside it, the two returns that must **pass** the same table: a legal `ThinkResult` on `think`
+# and a legal `ManagerReply` on `escalate`. Three calls, one table, two answers and one refusal.
+#
+# The refused payload contributes nothing to committed state and the boundary still commits: a
+# refusal does not abort the tick, and the tick's journal names it.
+
+name: option_a_refusal
+
+calls:
+  # The three calls this tick makes, in the order the nodes run.
+  - node: homeostasis
+    type: think
+    payload:
+      question: is the ceiling far off?
+  - node: hippocampus
+    type: escalate
+    payload:
+      concern: the retrieval window looks too narrow for this unit
+      unit_id: u-refusal-1
+  - node: thalamus
+    type: delegate
+    payload:
+      kind: writer
+      question: what is in the ledger?
+
+responses:
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    result:
+      emitter: manager
+      units:
+        - id: u-refusal-1
+          goal_id: $goal
+          intent: read the ledger and report
+          expected:
+            - id: e-refusal-1
+              kind: file_exists
+              arguments:
+                path: report.md
+
+  # A legal think return: it passes the table and decodes.
+  - tier: think
+    result:
+      emitter: think
+      answer: the ceiling is far off
+      confidence: 0.6
+
+  # A legal escalate return: a short answer and no authorization to spawn anything.
+  - tier: escalate
+    result:
+      emitter: escalate
+      answer: widen it next pass
+      proposed: []
+
+  # **The positive control.** An `ExecutorSummary`-shaped return, arriving on a delegate — the
+  # exact shape a node would use to claim it changed the workspace. Refused by the table before
+  # the decoder, and no retry follows.
+  - tier: delegate
+    result:
+      emitter: dispatch
+      unit_id: u-refusal-1
+      narrative: wrote the report myself and observed it on disk
+      observations:
+        - path: report.md
+          exists: true
+          size_bytes: 64
+          content_hash: sha-report-smuggled
+      exit_code: 0
+      cited_ids: []
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.5

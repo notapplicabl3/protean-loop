@@ -1,0 +1,32 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 2870,
+  "num_turns": 1,
+  "session_id": "seat-planner-0001",
+  "stop_reason": "tool_use",
+  "result": "{\"emitter\": \"planner\", \"tick\": 2, \"units\": [{\"id\": \"u-1\", \"revision\": 0, \"goal_id\": \"g-1\", \"status\": \"pending\", \"intent\": \"write the note the goal asks for\", \"irreversible\": false, \"constraints\": [], \"expected\": [{\"id\": \"e-1\", \"kind\": \"file_exists\", \"arguments\": {\"path\": \"notes.md\"}}]}], \"goals_satisfied\": [], \"mismatch_class\": null, \"trap_dismissed\": [], \"cited_ids\": []}",
+  "modelUsage": {
+    "protean-planner-model": {
+      "inputTokens": 902,
+      "outputTokens": 288,
+      "cacheReadInputTokens": 8192,
+      "cacheCreationInputTokens": 0,
+      "costUSD": 0.0
+    },
+    "claude-haiku-overhead": {
+      "inputTokens": 88,
+      "outputTokens": 14,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "costUSD": 0.0
+    }
+  },
+  "usage": {
+    "input_tokens": 902,
+    "output_tokens": 288,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 8192
+  }
+}

@@ -1,0 +1,124 @@
+# The hand-count. Every number below was counted off the two files beside it by eye, and
+# `tests/sleep/test_battery.py` asserts that `tests/wet/run_sleep_compare.py` reproduces it
+# exactly — § DoD row L10's "with a fixture pair proving the computation reproduces a hand-count".
+#
+# Count it yourself, in four readings of `run-1/seat_calls.jsonl`:
+#
+#   * five lines, but only FOUR distinct `(tick, tier)` keys — tick 2 carries a `decode_retry`
+#     line and the `ok` line that followed it, and § Resolutions S-1 collapses the pair to its
+#     tick. That collapse is the single most confusable thing in the metric, so it is the first
+#     thing the fixture puts in front of a reader.
+#   * `run-1/habit_hits.jsonl` is present and empty: run 1 had no habits, and an empty file says
+#     so where an absent one would only be ambiguous.
+#   * run 2 answers tick 1 and tick 4 from a compiled procedure and makes no planner call at all,
+#     so the planner's calls-per-tick falls to zero while its seat ticks stay non-zero. That is
+#     number 2 doing the only thing it exists to do.
+#   * run 2 makes a fourth executor call at tick 5, AFTER the tick at which the graded unit state
+#     was reached. Number 1 is cut off at `through_tick` and does not see it; numbers 2 and 3 are
+#     the whole run's and do. A fixture in which the cut-off changed nothing would prove nothing.
+#
+# The director answered no tick on either side: its calls-per-tick is 0.0 rather than undefined,
+# which is the reading an addressee with an empty denominator gets. Build A.1 made the report
+# per-ADDRESSEE rather than per-tier — the work is a manager `dispatch` now, and a row keyed by
+# tier would drop tier three's spend out of the comparison entirely — so `think`, `escalate` and
+# `delegate` each carry that same empty row here. Run 1 and run 2 made none of those calls.
+
+run_1:
+  task: task-run-1
+  through_tick: 4
+  calls_to_state: 4
+  per_tier:
+    - {tier: director, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: manager, live_calls: 1, habit_hits: 0, seat_ticks: 1, calls_per_tick: 1.0, cost_usd: 1.5}
+    - {tier: think, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: escalate, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: delegate, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: dispatch, live_calls: 3, habit_hits: 0, seat_ticks: 3, calls_per_tick: 1.0, cost_usd: 3.25}
+
+run_2:
+  task: task-run-2
+  through_tick: 4
+  calls_to_state: 3
+  per_tier:
+    - {tier: director, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: manager, live_calls: 0, habit_hits: 2, seat_ticks: 2, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: think, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: escalate, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: delegate, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: dispatch, live_calls: 4, habit_hits: 0, seat_ticks: 4, calls_per_tick: 1.0, cost_usd: 2.5}
+
+# Run 3 is the wave case (`the build specification (not in this mirror)` § Deliverable 5). Count it in two
+# readings of `run-3/seat_calls.jsonl`:
+#
+#   * five lines, all at tick 1: one `manager` seat call, then ONE dispatch wave — four lines under
+#     the same `call_number` 2, told apart only by `member_number` 1 to 4. Each member is its own
+#     process and its own `costUSD`, so each is its own live call: the dispatch row's live_calls is
+#     4, and calls_to_state is 1 + 4 = 5. The key before A.2 was `(tick, tier)`, which collapsed the
+#     four members into one and read 2 here.
+#   * the four members ran at ONE tick, so the dispatch row's seat_ticks is 1 and its
+#     calls_per_tick is 4 / 1 = 4.0. S-1's identity, seat_ticks = live_calls + habit_hits, holds on
+#     every member-less row (manager: 1 = 1 + 0) and not on the wave's (4 + 0 is not 1): the
+#     denominator counts ticks and the numerator counts members. `run-3/habit_hits.jsonl` is
+#     present and empty. Dispatch cost is 0.5 + 0.25 + 0.75 + 0.5 = 2.0.
+
+run_3:
+  task: task-run-3
+  through_tick: 1
+  calls_to_state: 5
+  per_tier:
+    - {tier: director, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: manager, live_calls: 1, habit_hits: 0, seat_ticks: 1, calls_per_tick: 1.0, cost_usd: 1.25}
+    - {tier: think, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: escalate, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: delegate, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: dispatch, live_calls: 4, habit_hits: 0, seat_ticks: 1, calls_per_tick: 4.0, cost_usd: 2.0}
+
+# Run 4 is the node-call case (`the build specification (not in this mirror)` § Deliverable 6). Count it in
+# three readings of `run-4/seat_calls.jsonl`:
+#
+#   * four lines, all at tick 1: two `homeostasis` think lines, one `manager` seat call, then one
+#     `anterior_cingulate` think line. Both nodes' thinks sit at `call_number` 1 with no
+#     `member_number` — each node numbers its own calls from 1 — so they are told apart only by
+#     `node`. Each is its own process, so the think row's live_calls is 2, and calls_to_state is
+#     2 + 1 = 3. The key before A.2.i was `(tick, tier, member#)`, which read both thinks as
+#     `(1, think, None)`, collapsed them into one, and read the think row's live_calls as 1 and
+#     calls_to_state as 2 here.
+#   * the first `homeostasis` line is a `decode_retry` and the second the `ok` that followed it:
+#     the same tick, tier, node, call# and member#, so the pair collapses to one live call, as
+#     run 1's tick 2 does. Four lines, three distinct keys.
+#   * the two thinks ran at ONE tick, so the think row's seat_ticks is 1 and its calls_per_tick is
+#     2 / 1 = 2.0. S-1's identity, seat_ticks = live_calls + habit_hits, holds on every row whose
+#     every tick carries one call key (manager: 1 = 1 + 0) and not on the think row's (2 + 0 is
+#     not 1): the denominator counts ticks and the numerator counts calls.
+#     `run-4/habit_hits.jsonl` is present and empty. Think cost is 0.0625 + 0.125 + 0.125 = 0.3125
+#     — the retry's first attempt was paid for, though it is not a second live call.
+
+run_4:
+  task: task-run-4
+  through_tick: 1
+  calls_to_state: 3
+  per_tier:
+    - {tier: director, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: manager, live_calls: 1, habit_hits: 0, seat_ticks: 1, calls_per_tick: 1.0, cost_usd: 1.25}
+    - {tier: think, live_calls: 2, habit_hits: 0, seat_ticks: 1, calls_per_tick: 2.0, cost_usd: 0.3125}
+    - {tier: escalate, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: delegate, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+    - {tier: dispatch, live_calls: 0, habit_hits: 0, seat_ticks: 0, calls_per_tick: 0.0, cost_usd: 0.0}
+
+# The gate, and the clause beside it. The mismatch rates are hand-set here rather than read off a
+# journal: they are not among the three numbers, and this fixture exists to prove the three.
+acceptance:
+  calls_fell: true
+  rates_held: true
+  accepted: true
+  mismatch_rates_1: {manager: 0.5, dispatch: 0.25}
+  mismatch_rates_2: {manager: 0.5, dispatch: 0.25}
+
+# The same rates with one tier risen — the arm that proves acceptance is a conjunction and not a
+# restatement of the gate.
+risen:
+  mismatch_rates_2: {manager: 0.75, dispatch: 0.25}
+  calls_fell: true
+  rates_held: false
+  risen_tiers: [manager]
+  accepted: false

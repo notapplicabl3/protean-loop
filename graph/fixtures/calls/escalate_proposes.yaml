@@ -1,0 +1,92 @@
+# escalate_proposes — a **pre-cortex** escalate proposing a member, and the manager assembling
+# it into that pass's single wave.
+#
+# `the build specification (not in this mirror)` § Deliverable 3, "One dispatch wave per tick, and only
+# the manager assembles it" (folded: S-A3, folded: S-A33): "An escalate reply to a **pre-cortex**
+# node **proposes** members for that tick's wave, and the manager includes or drops each proposal
+# at its own step. **An escalate reply never authorizes a member** — it is advice in a
+# `ManagerReply` from a cheap tool-less call, and Option A would be a slogan if a reply could
+# spawn."
+#
+# So: the thalamus escalates, the reply **proposes** `patcher`, and **nothing is spawned by the
+# escalate itself** — the port sees no dispatch before the cortex's own step. The manager then
+# names `patcher` in its wave, which is what "included" means, and the wave is dispatched once,
+# at the cortex step, under one `call#`.
+
+name: escalate_proposes
+
+calls:
+  - node: thalamus
+    type: escalate
+    payload:
+      concern: this unit needs a patch written before anything can be checked
+      unit_id: u-prop-1
+      proposal: dispatch a patcher
+
+responses:
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    result:
+      emitter: manager
+      units:
+        - id: u-prop-1
+          goal_id: $goal
+          intent: patch the ledger
+          expected:
+            - id: e-prop-1
+              kind: file_exists
+              arguments:
+                path: patched.md
+
+  # The acting call: the manager includes the proposal in its own wave. It is the manager's
+  # plan that authorizes the member, never the reply that proposed it.
+  - tier: manager
+    result:
+      emitter: manager
+      units:
+        - id: u-prop-1
+          goal_id: $goal
+          intent: patch the ledger
+          expected:
+            - id: e-prop-1
+              kind: file_exists
+              arguments:
+                path: patched.md
+      wave:
+        - kind: patcher
+          unit_id: u-prop-1
+          admitted_ref: admitted
+
+  # The escalate's reply: a short answer and a **proposal**, which authorizes nothing.
+  - tier: escalate
+    result:
+      emitter: escalate
+      answer: yes, a patch first
+      proposed:
+        - kind: patcher
+          unit_id: u-prop-1
+          admitted_ref: admitted
+
+  - tier: dispatch
+    when:
+      kind: patcher
+    result:
+      emitter: dispatch
+      unit_id: $unit
+      narrative: patched the ledger
+      observations:
+        - path: patched.md
+          exists: true
+          size_bytes: 21
+          content_hash: sha-patched-a
+      exit_code: 0
+      cited_ids: []
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.5

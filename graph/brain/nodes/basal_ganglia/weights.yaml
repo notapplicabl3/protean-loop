@@ -1,0 +1,13 @@
+# Basal ganglia — the gate. No tunable exists here, deliberately.
+#
+# `the build specification (not in this mirror)` § Deliverable 2, `SelectionVerdict`: the veto predicate is
+# catastrophic-only and has exactly two arms — an `Expectation` argument path outside the task
+# workspace root as narrowed by any `path_scope` constraint, or a unit declared
+# `irreversible: true` with no `allow_irreversible` constraint naming it. "Nothing else vetoes."
+#
+# Both arms are contractual inhibition (`DIGEST:51`), so neither is a threshold anyone may
+# retune: a weights key here would be an invitation to loosen a catastrophic-only gate, which
+# is the failure mode the operator's over-firing constraint names one layer up. The folder carries the
+# file because every node folder carries all four entries (decision 5); it carries an empty
+# mapping because the gate has nothing to tune.
+{}

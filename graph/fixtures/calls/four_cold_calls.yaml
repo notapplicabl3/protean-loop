@@ -1,0 +1,100 @@
+# four_cold_calls — one tick, four session-less calls, and the cost that must equal their sum.
+#
+# `the build specification (not in this mirror)` § Deliverable 7 and § DoD row G8. The built runtime
+# incremented `tokens_this_tick` **once**, inside the seat branch, so a tick holding N calls
+# under-counted by N−1; this fixture is the measurement that makes the under-count visible and
+# the arithmetic that replaces it checkable.
+#
+# **The measured tick makes four calls and no seat call.** The unit the opening manager response
+# mints is `irreversible: true` and no `allow_irreversible` constraint names it, so on the second
+# tick the gate vetoes — the seat call is skipped and the tick's calls are exactly the four the
+# `calls:` plan below names. The veto reaches the dispatch wave and every **delegate**; think and
+# escalate stay allowed (§ DoD row G2), which is why all four are thinks and escalates.
+#
+# **All four are session-less, so all four are cold** (§ Deliverable 2, folded: S-A31): a think
+# or an escalate carries a fresh `--session-id` per invocation and nothing about it is
+# checkpointed, so the tick's cost is the plain sum of four cold calls with no cross-call
+# cache-read discount to assume. The declared `cache_read_input_tokens` are large on purpose: a
+# spend rule that counted them would charge a cache hit at the price of a miss, which is exactly
+# what `spend_tokens()` leaves out.
+#
+# Nothing here spawns: every answer is a scripted return with no process behind it (row G12).
+
+name: four_cold_calls
+
+calls:
+  - node: homeostasis
+    type: think
+    payload:
+      question: is this tick's spend near the ceiling?
+      context: the tick's own counters
+  - node: hippocampus
+    type: think
+    payload:
+      question: is the retrieval window wide enough for this unit?
+  - node: thalamus
+    type: escalate
+    payload:
+      concern: the admitted set looks thin for this unit
+      unit_id: u-cold-1
+      proposal: widen the window, or re-plan
+  - node: anterior_cingulate
+    type: escalate
+    payload:
+      concern: the gate vetoed the unit and the plan has not changed
+      unit_id: u-cold-1
+
+responses:
+  # The opening seat call: the unit stack is empty, and the unit it mints is the one the gate
+  # vetoes on the next tick.
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    usage:
+      input_tokens: 40
+      cache_creation_input_tokens: 60
+      output_tokens: 10
+      cache_read_input_tokens: 1000
+    result:
+      emitter: manager
+      units:
+        - id: u-cold-1
+          goal_id: $goal
+          intent: drop the table the goal names
+          irreversible: true
+          expected:
+            - id: e-cold-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+
+  # think — 7 + 11 + 3 = 21 spend tokens, and 5000 cache reads that are not spend.
+  - tier: think
+    usage:
+      input_tokens: 7
+      cache_creation_input_tokens: 11
+      output_tokens: 3
+      cache_read_input_tokens: 5000
+    result:
+      emitter: think
+      answer: the ceiling is far off and the last three ticks were cheap
+      confidence: 0.6
+
+  # escalate — 13 + 2 + 5 = 20 spend tokens, and 9000 cache reads that are not spend.
+  - tier: escalate
+    usage:
+      input_tokens: 13
+      cache_creation_input_tokens: 2
+      output_tokens: 5
+      cache_read_input_tokens: 9000
+    result:
+      emitter: escalate
+      answer: keep admitting; the unit is still the right one
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.5

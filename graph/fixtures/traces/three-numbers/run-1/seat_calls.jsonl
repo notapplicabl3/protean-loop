@@ -1,0 +1,5 @@
+{"schema_version":3,"task":"task-run-1","tick":1,"tier":"manager","ref":"task-run-1:1:cortex:manager:prediction","model":"claude-opus-5","outcome":"ok","model_usage":{"claude-opus-5":{"costUSD":1.5}}}
+{"schema_version":3,"task":"task-run-1","tick":2,"tier":"dispatch","ref":"task-run-1:2:cortex:dispatch:prediction","model":"claude-opus-5","outcome":"decode_retry","model_usage":{"claude-opus-5":{"costUSD":0.25}}}
+{"schema_version":3,"task":"task-run-1","tick":2,"tier":"dispatch","ref":"task-run-1:2:cortex:dispatch:prediction","model":"claude-opus-5","outcome":"ok","model_usage":{"claude-opus-5":{"costUSD":1.75}}}
+{"schema_version":3,"task":"task-run-1","tick":3,"tier":"dispatch","ref":"task-run-1:3:cortex:dispatch:prediction","model":"claude-opus-5","outcome":"ok","model_usage":{"claude-opus-5":{"costUSD":0.75}}}
+{"schema_version":3,"task":"task-run-1","tick":4,"tier":"dispatch","ref":"task-run-1:4:cortex:dispatch:prediction","model":"claude-opus-5","outcome":"ok","model_usage":{"claude-opus-5":{"costUSD":0.5}}}

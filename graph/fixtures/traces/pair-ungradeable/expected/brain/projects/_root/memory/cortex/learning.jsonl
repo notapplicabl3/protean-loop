@@ -1,0 +1,2 @@
+{"schema_version":1,"project":"_root","node":"cortex","sleep_id":"sleep-20260908-000000Z","task":"task-fixture","tick":2,"ref":"task-fixture:2:cortex:dispatch:prediction","signal":"dispatch_expectations","key":null,"matched":false,"admissible":false,"excluded_reason":"ungradeable","consumed_by":{}}
+{"schema_version":1,"project":"_root","node":"cortex","sleep_id":"sleep-20260908-000000Z","admissible":0,"matched":0,"excluded":{"unjoined":0,"off-list":0,"ungradeable":1,"vacuous":0},"updates":0,"procedures":0,"kind":"summary"}

@@ -1,0 +1,95 @@
+# firing_ceiling — a think call on homeostasis, so "only its think call is skippable" is visible.
+#
+# `the build specification (not in this mirror)` § Deliverable 1's homeostasis bullet and § DoD row G2.
+# Homeostasis is one of the two contractual inhibitions: its ceiling evaluation and its `stop`
+# flag **always** run and it always produces its full `HomeostasisReport`, so the only thing its
+# cheap check can decline is the nuance call it may make. `fixtures/calls/ceiling_crossing.yaml`
+# deliberately puts **no** call on homeostasis, because a call issued at its step precedes its
+# body's reading; this fixture puts one there for the opposite reason — the skip that has to be
+# shown is the call's, and it is decided before the body runs either way.
+#
+# The three calls after it are the suppression half: a crossed ceiling suppresses every further
+# model call for the rest of the tick while the remaining nodes still run, and a tick that
+# suppressed them still commits `stopped` with a full report in `latest`.
+#
+# The ceiling itself is not here. `max_tokens` lives in the brain root's own
+# `nodes/homeostasis/weights.yaml` and the battery writes it into the **throwaway** root, exactly
+# as `ceiling_crossing.yaml` says: a fixture that named a number would be a ceiling in two places.
+# `firing_threshold` is the same rule one key over.
+#
+# The unit is `irreversible: true` so the gate vetoes it from the second pass on: the measured
+# passes then make the planned calls and no seat call, and those calls are the whole spend.
+
+name: firing_ceiling
+
+calls:
+  - node: homeostasis
+    type: think
+    payload:
+      question: how much headroom is left?
+  - node: hippocampus
+    type: think
+    payload:
+      question: is the window wide enough?
+  - node: thalamus
+    type: think
+    payload:
+      question: is the admitted set thin?
+  - node: anterior_cingulate
+    type: escalate
+    payload:
+      concern: the plan has not changed since the veto
+      unit_id: u-firing-ceiling-1
+
+responses:
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    usage:
+      input_tokens: 31
+      cache_creation_input_tokens: 21
+      output_tokens: 11
+      cache_read_input_tokens: 1001
+    result:
+      emitter: manager
+      units:
+        - id: u-firing-ceiling-1
+          goal_id: $goal
+          intent: drop the table the goal names
+          irreversible: true
+          expected:
+            - id: e-firing-ceiling-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+
+  # think — 7 + 1 + 1 = 9 spend tokens. Cheap: no single call of a pass crosses anything.
+  - tier: think
+    usage:
+      input_tokens: 7
+      cache_creation_input_tokens: 1
+      output_tokens: 1
+      cache_read_input_tokens: 7001
+    result:
+      emitter: think
+      answer: some headroom, not much
+      confidence: 0.25
+
+  # escalate — 9 + 1 + 1 = 11 spend tokens.
+  - tier: escalate
+    usage:
+      input_tokens: 9
+      cache_creation_input_tokens: 1
+      output_tokens: 1
+      cache_read_input_tokens: 3001
+    result:
+      emitter: escalate
+      answer: hold the unit; nothing has changed
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.25

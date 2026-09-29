@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "sleep_id": "sleep-20260908-000000Z",
+  "dry_run": false,
+  "source": {
+    "runs": [
+      {
+        "source": "$source",
+        "task": "task-fixture",
+        "ticks": 4,
+        "terminal": "done",
+        "project": "_root"
+      }
+    ],
+    "seed_hashes": {
+      "nodes/anterior_cingulate/weights.yaml": "$seed:nodes/anterior_cingulate/weights.yaml",
+      "nodes/basal_ganglia/weights.yaml": "$seed:nodes/basal_ganglia/weights.yaml",
+      "nodes/cortex/weights.yaml": "$seed:nodes/cortex/weights.yaml",
+      "nodes/hippocampus/weights.yaml": "$seed:nodes/hippocampus/weights.yaml",
+      "nodes/homeostasis/weights.yaml": "$seed:nodes/homeostasis/weights.yaml",
+      "nodes/thalamus/weights.yaml": "$seed:nodes/thalamus/weights.yaml"
+    },
+    "brain_root": "$brain"
+  },
+  "evidence": {
+    "signals": [
+      {
+        "signal": "hippocampus_citation",
+        "pairs": 2,
+        "admissible": 2,
+        "matched": 1,
+        "excluded": {
+          "unjoined": 0,
+          "off-list": 0,
+          "ungradeable": 0,
+          "vacuous": 0
+        }
+      }
+    ],
+    "pairs": 2,
+    "admissible": 2,
+    "excluded": {
+      "unjoined": 0,
+      "off-list": 0,
+      "ungradeable": 0,
+      "vacuous": 0
+    }
+  },
+  "weights": {
+    "updates": [
+      {
+        "schema_version": 1,
+        "node": "hippocampus",
+        "key": "candidate_window",
+        "from_value": 20,
+        "to_value": 19,
+        "direction": "tighten",
+        "signal": "hippocampus_citation",
+        "evidence": {
+          "refs": [
+            "r-1",
+            "task-fixture:1:hippocampus:-:prediction",
+            "task-fixture:2:hippocampus:-:prediction"
+          ],
+          "tasks": [
+            "task-earlier",
+            "task-fixture"
+          ],
+          "projects": [
+            "_root"
+          ],
+          "pairs": 3,
+          "matched": 2,
+          "match_rate": 0.6666666666666666,
+          "required_pairs": 3,
+          "required_tasks": 2,
+          "confirmations": 0,
+          "every_task_done": null,
+          "floor_minimum": null
+        },
+        "applied": true,
+        "withheld_reason": "",
+        "seed_hash": "$seed:nodes/hippocampus/weights.yaml",
+        "was_seeded": true
+      },
+      {
+        "schema_version": 1,
+        "node": "hippocampus",
+        "key": "semantic_window",
+        "from_value": 8,
+        "to_value": 7,
+        "direction": "tighten",
+        "signal": "hippocampus_citation",
+        "evidence": {
+          "refs": [
+            "r-1",
+            "task-fixture:1:hippocampus:-:prediction",
+            "task-fixture:2:hippocampus:-:prediction"
+          ],
+          "tasks": [
+            "task-earlier",
+            "task-fixture"
+          ],
+          "projects": [
+            "_root"
+          ],
+          "pairs": 3,
+          "matched": 2,
+          "match_rate": 0.6666666666666666,
+          "required_pairs": 3,
+          "required_tasks": 2,
+          "confirmations": 0,
+          "every_task_done": null,
+          "floor_minimum": null
+        },
+        "applied": true,
+        "withheld_reason": "",
+        "seed_hash": "$seed:nodes/hippocampus/weights.yaml",
+        "was_seeded": false
+      },
+      {
+        "schema_version": 1,
+        "node": "hippocampus",
+        "key": "semantic_min_overlap",
+        "from_value": 0.1,
+        "to_value": 0.11,
+        "direction": "tighten",
+        "signal": "hippocampus_citation",
+        "evidence": {
+          "refs": [
+            "r-1",
+            "task-fixture:1:hippocampus:-:prediction",
+            "task-fixture:2:hippocampus:-:prediction"
+          ],
+          "tasks": [
+            "task-earlier",
+            "task-fixture"
+          ],
+          "projects": [
+            "_root"
+          ],
+          "pairs": 3,
+          "matched": 2,
+          "match_rate": 0.6666666666666666,
+          "required_pairs": 3,
+          "required_tasks": 2,
+          "confirmations": 0,
+          "every_task_done": null,
+          "floor_minimum": null
+        },
+        "applied": true,
+        "withheld_reason": "",
+        "seed_hash": "$seed:nodes/hippocampus/weights.yaml",
+        "was_seeded": false
+      }
+    ]
+  },
+  "procedures": {
+    "written": [],
+    "rejected": [],
+    "withdrawn": []
+  },
+  "project_memory": {
+    "records": [
+      {
+        "schema_version": 1,
+        "project": "_root",
+        "node": "hippocampus",
+        "sleep_id": "sleep-20260908-000000Z",
+        "task": "task-fixture",
+        "tick": 1,
+        "ref": "task-fixture:1:hippocampus:-:prediction",
+        "signal": "hippocampus_citation",
+        "key": null,
+        "matched": true,
+        "admissible": true,
+        "excluded_reason": "",
+        "consumed_by": {
+          "candidate_window": "sleep-20260908-000000Z:hippocampus/candidate_window",
+          "semantic_window": "sleep-20260908-000000Z:hippocampus/semantic_window",
+          "semantic_min_overlap": "sleep-20260908-000000Z:hippocampus/semantic_min_overlap"
+        }
+      },
+      {
+        "schema_version": 1,
+        "project": "_root",
+        "node": "hippocampus",
+        "sleep_id": "sleep-20260908-000000Z",
+        "task": "task-fixture",
+        "tick": 2,
+        "ref": "task-fixture:2:hippocampus:-:prediction",
+        "signal": "hippocampus_citation",
+        "key": null,
+        "matched": false,
+        "admissible": true,
+        "excluded_reason": "",
+        "consumed_by": {
+          "candidate_window": "sleep-20260908-000000Z:hippocampus/candidate_window",
+          "semantic_window": "sleep-20260908-000000Z:hippocampus/semantic_window",
+          "semantic_min_overlap": "sleep-20260908-000000Z:hippocampus/semantic_min_overlap"
+        }
+      }
+    ],
+    "summaries": [
+      {
+        "schema_version": 1,
+        "project": "_root",
+        "node": "hippocampus",
+        "sleep_id": "sleep-20260908-000000Z",
+        "admissible": 2,
+        "matched": 1,
+        "excluded": {
+          "unjoined": 0,
+          "off-list": 0,
+          "ungradeable": 0,
+          "vacuous": 0
+        },
+        "updates": 3,
+        "procedures": 0,
+        "kind": "summary"
+      }
+    ]
+  },
+  "files_written": [
+    "nodes/hippocampus/weights.yaml",
+    "projects/_root/memory/hippocampus/learning.jsonl"
+  ],
+  "notes": []
+}

@@ -53,6 +53,10 @@ The receipts predate two renames: `manager` in them is the director seat, and li
 
 **What was cut.** This rewrite replaced a much larger implementation: a six-node ring with per-node traces and firing grades, a second planning seat, a semantic store and intake, torn-tick replay and receipt reconciliation, think/escalate/delegate machinery, and seventy versioned schemas. Each was bookkeeping around the two steps that matter — plan a unit, verify a unit — and the rewrite landed at roughly a tenth of the size, with a battery that calls no model.
 
+## The graph: the earlier generation
+
+`graph/` is the implementation this loop replaced, exported from the tag it was retired at: a fixed ring of six nodes named for the brain regions whose jobs they borrow (cortex, thalamus, hippocampus, basal ganglia, anterior cingulate, homeostasis), each a folder holding its contract and its weakenable weights, with a tick loop, torn-tick replay, a kind library for contained subagents, a mailbox and offline learning. It is a self-contained project with its own README, Map and battery; run it from inside `graph/`. The loop at this root kept the two steps that mattered and dropped the rest, and `graph/architecture-logic.md` is where the reasoning behind each part lives.
+
 ## What is withheld and why
 
 | Withheld | Why |
@@ -65,4 +69,4 @@ The renaming was small: the operator's name in the loop's notes, the director pr
 
 ## Status
 
-The rewrite reached `done` on its first two live runs (receipts under `evidence/`; the second needed a decoder fix mid-run); a failed attempt is the one path not yet exercised live. This mirror is re-exported by hand and lags the working repository. **Last updated: 2026-09-27.**
+The rewrite reached `done` on its first two live runs (receipts under `evidence/`; the second needed a decoder fix mid-run); a failed attempt is the one path not yet exercised live. This mirror is re-exported by hand and lags the working repository. **Last updated: 2026-09-28.**

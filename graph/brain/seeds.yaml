@@ -1,0 +1,69 @@
+# brain/seeds.yaml — the seeding map: which memory a seeded weights key came from.
+#
+# `the build specification (not in this mirror)` § Deliverable 3, *Seeded priors come in, narrowly*
+# (§ Directional decisions 5 and 12, § Rulings 20, folded: A1-7, S-10, S-15).
+#
+# **The row IS the provenance.** No `seeds:` block enters any `weights.yaml` — that would mint a
+# key (decision 11), break row L4's `## Weights` identity, and reach the extras-forbidden node
+# input projection (folded: S-10). A weights key is *seeded* exactly when this file names it,
+# which is what gives `WeightUpdate.was_seeded` — and the weakening clause it serves — a subject
+# at all: without a seeded key there is nothing in a weights file for sleep to weaken.
+#
+# **A new file, not a widening of seam contract S3** (folded: S-15). `brain/intake/manifest.yaml`
+# keeps its shape and decision 2 stays true; the map lives here, beside `brain/seats.yaml`, and
+# is hashed into the checkpoint through the widened seed ladder like every other seed — so a
+# hand edit between two ticks is a drift refusal rather than a silent adoption.
+#
+# **Sparse and hand-authored, and it is not a second copy of the weights tree.** Five rows, five
+# nodes, and every value equal to the number that node's own file carries today. A row naming a
+# node or a key that does not exist is a refused map, never an insert
+# (`src/protean/intake/seeds.py`), and the gate is unreachable by construction —
+# `config.WEIGHTS_WRITABLE_NODES` is `NODE_ORDER` less `basal_ganglia`, whose weights file is
+# the empty mapping by contract.
+#
+# **The collision rule keeps two writers off one file** — S-21's first-write-only guard, revived
+# (§ Named assumptions 11). `protean intake` re-values a key **only** while the on-disk value
+# still equals the row's value, and skips-and-prints it once sleep has moved it. Sleep stays the
+# sole *re*writer; intake stays a seeder between tasks.
+#
+# **A logical memory name, never a path.** Each block's key is the *name* of one memory file, in
+# the same spirit that makes S3 name logical sources: the one module licensed to turn a name
+# into a location is `src/protean/intake/policy_home.py`, so this tracked seed carries no policy-home
+# path either. The rationale under each row is stated in this build's own terms, never quoted.
+
+rule_check_holdings:
+  # Reach for what is already held before concluding nothing is there. `candidate_window` is how
+  # much of this task's own episode record the boundary loader offers the hippocampus, and a
+  # narrow window is exactly the miss this memory names.
+  - node: hippocampus
+    key: candidate_window
+    value: 20
+
+rule_periodic_self_check:
+  # A long loop looks at the whole on a rhythm rather than after every unit. `manager_horizon`
+  # is how many units the manager commits to before the ladder's first rung reconsiders them.
+  - node: cortex
+    key: manager_horizon
+    value: 4
+
+rule_gate_catastrophic_only:
+  # A detector earns its interrupt by persisting; one broadened to catch the merely unusual
+  # false-positives on healthy work. `forming_ticks` is how many consecutive ticks of the wrong
+  # approach the anterior cingulate tolerates before it fires.
+  - node: anterior_cingulate
+    key: forming_ticks
+    value: 6
+
+rule_background_jobs:
+  # Long work is designed to survive being cut off rather than trusted to finish, so the
+  # wall-clock ceiling bounds one task instead of standing in for a guarantee.
+  - node: homeostasis
+    key: max_wall_seconds
+    value: 3600
+
+rule_wide_harvest:
+  # Admission is wide by default and every exclusion stays visible on `AdmittedContext`.
+  # `max_admitted` is that width — the ceiling on what one tick's seat is allowed to see.
+  - node: thalamus
+    key: max_admitted
+    value: 12

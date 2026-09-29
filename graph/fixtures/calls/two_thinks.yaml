@@ -1,0 +1,93 @@
+# two_thinks — two nodes' think calls in one pass, each raising its own question.
+#
+# `the build specification (not in this mirror)` § Scaffold clause item 2, contract 4 (a): "**`node` is
+# in the id and not merely in the file's body** ... a call type is a raiser shared by every
+# outer node, so two nodes' think calls in one tick would otherwise collapse onto one filename".
+# This is that pass: the same scripted answer to both, because a responder is request-keyed and a
+# think call carries no field that tells the two nodes apart — which is precisely why the id has
+# to carry the node.
+#
+# The member of the wave raises one too, under the same rule one level down: a wave's members
+# share a `call#`, so the id carries `member#` as well.
+
+name: two_thinks
+
+calls:
+  - node: homeostasis
+    type: think
+    payload:
+      question: is the ceiling far off?
+  - node: hippocampus
+    type: think
+    payload:
+      question: is the window wide enough?
+
+responses:
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    result:
+      emitter: manager
+      units:
+        - id: u-raise-1
+          goal_id: $goal
+          intent: settle the ledger question
+          expected:
+            - id: e-raise-1
+              kind: file_exists
+              arguments:
+                path: settled.md
+
+  - tier: manager
+    result:
+      emitter: manager
+      units:
+        - id: u-raise-1
+          goal_id: $goal
+          intent: settle the ledger question
+          expected:
+            - id: e-raise-1
+              kind: file_exists
+              arguments:
+                path: settled.md
+      wave:
+        - kind: settler
+          unit_id: u-raise-1
+          admitted_ref: admitted
+
+  - tier: think
+    result:
+      emitter: think
+      answer: I cannot tell from here
+      confidence: 0.1
+      interrupt:
+        kind: question
+        raised_by: think
+        question: which ledger did you mean?
+
+  - tier: dispatch
+    when:
+      kind: settler
+    result:
+      emitter: dispatch
+      unit_id: $unit
+      narrative: settled what I could and asked about the rest
+      observations:
+        - path: settled.md
+          exists: true
+          size_bytes: 12
+          content_hash: sha-settled-a
+      exit_code: 0
+      cited_ids: []
+      interrupt:
+        kind: question
+        raised_by: dispatch
+        question: which ledger did you mean?
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.5

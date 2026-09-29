@@ -1,0 +1,37 @@
+# Arm 5: an update refused for naming a key the file does not carry.
+#
+# `semantic_window` is removed from the hippocampus's `weights.yaml` before the run, so the map
+# names a key the node no longer has. § Directional decisions 11: an update re-values an EXISTING
+# key and never mints, deletes or moves one — so the refusal is a reported record and not an
+# insertion, and the sibling keys still apply in the same run.
+
+arm: update-absent-key
+about: the map names a key the weights file does not carry — refused, never inserted
+
+run:
+  task: task-fixture
+  final_tick: 4
+  terminal: done
+  pairs:
+    - {kind: hippocampus_citation, tick: 1, matched: true}
+    - {kind: hippocampus_citation, tick: 2, matched: false}
+
+brain:
+  drop_weight_keys:
+    - {node: hippocampus, key: semantic_window}
+  memory:
+    - {node: hippocampus, task: task-earlier, tick: 1, ref: r-1, signal: hippocampus_citation, matched: true}
+
+claims:
+  pairs: 2
+  admissible: 2
+  applied:
+    - {node: hippocampus, key: candidate_window, from: 20, to: 19, direction: tighten, was_seeded: false}
+    - {node: hippocampus, key: semantic_min_overlap, from: 0.1, to: 0.11, direction: tighten, was_seeded: false}
+  withheld:
+    - {node: hippocampus, key: semantic_window, direction: tighten, because: "absent key: 'semantic_window' is not in weights.yaml"}
+  procedures_written: []
+  procedures_withdrawn: []
+  files_written:
+    - nodes/hippocampus/weights.yaml
+    - projects/_root/memory/hippocampus/learning.jsonl

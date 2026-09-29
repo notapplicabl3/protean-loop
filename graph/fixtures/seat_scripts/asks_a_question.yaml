@@ -1,0 +1,95 @@
+# asks_a_question — the responders for a run in which a seat raises an ordinary interrupt.
+#
+# `the build specification (not in this mirror)` § Deliverable 5, *Raising* (folded: S-2, folded: U-2): "a
+# node *requests* an interrupt as ordinary output — the optional `interrupt` slot on its output
+# model ... the runtime commits the cycle, writes the file, persists state and exits
+# `interrupted`. **No node writes the mailbox.**" A seat's request travels inside
+# `SeatEnvelope.result`, which is why it is written here as a field of the result and not as
+# anything the script does to the filesystem.
+#
+# `kind: question` is a node's ordinary output and `raised_by` is the tier that asked; the
+# runtime is licensed for `stuck` and for no other kind, which is why no response below names
+# it. There is no `default`: an unanswered item is refused, never defaulted.
+#
+# The shape: plan a unit, do it and ask about it, then — once the answer has landed — close the
+# goal. The raise rides the executor, so the turn before it is a completed and checkpointed one,
+# which is what a crash-replay case needs to have somewhere to resume from.
+
+name: asks_a_question
+
+responses:
+  # The unit came back passing and the question has been answered, so the goal closes.
+  - tier: manager
+    when:
+      unit_id: u-q1
+    result:
+      emitter: manager
+      goals_satisfied:
+        - $goal
+
+  # The opening call.
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    result:
+      emitter: manager
+      units:
+        - id: u-q1
+          goal_id: $goal
+          intent: write the answer file the goal asks for
+          expected:
+            - id: e-q1
+              kind: file_exists
+              arguments:
+                path: answer.md
+
+  # The acting call: nothing escalated, so the manager acts. It restates the unit it is
+  # dispatching for and names the wave beside it; its condition is empty, so it is written
+  # after the two narrower manager responses above.
+  - tier: manager
+    result:
+      emitter: manager
+      units:
+        - id: u-q1
+          goal_id: $goal
+          intent: write the answer file the goal asks for
+          expected:
+            - id: e-q1
+              kind: file_exists
+              arguments:
+                path: answer.md
+      wave:
+        - kind: writer
+          unit_id: u-q1
+          admitted_ref: admitted
+
+  # **The raise rides the wave's member**, which is what gives it a call-bearing raiser: the
+  # member's id carries the calling node and the call components, so two members of one wave
+  # could not collapse onto one filename. The answer path is unchanged — the operator writes under
+  # `## Answer` in the same file, and `resolution_target()` reads the asking node out of the id.
+  - tier: dispatch
+    when:
+      kind: writer
+    result:
+      emitter: dispatch
+      unit_id: $unit
+      narrative: wrote the answer file, and one thing needs a human
+      observations:
+        - path: answer.md
+          exists: true
+          size_bytes: 31
+          content_hash: sha-answer-a
+      exit_code: 0
+      cited_ids: []
+      interrupt:
+        kind: question
+        raised_by: dispatch
+        question: which ledger did you mean?
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.45

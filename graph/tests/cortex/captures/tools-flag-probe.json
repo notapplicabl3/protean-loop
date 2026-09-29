@@ -1,0 +1,317 @@
+{
+ "cli_version": "2.1.263 (Claude Code)",
+ "env_widened_for_the_probe": [
+  "USER"
+ ],
+ "tools_flag_returns_structured_result": true,
+ "realization": "--tools ''",
+ "calls": [
+  {
+   "tier": "director",
+   "tools": "",
+   "env_passthrough": [
+    "PATH",
+    "HOME",
+    "LANG",
+    "TERM",
+    "USER"
+   ],
+   "structured": true,
+   "refusal": null,
+   "stop_reason": "tool_use",
+   "result": "{\"cited_ids\":[],\"constraints\":[],\"goals_closed\":[],\"goals_pushed\":[],\"interrupt\":null,\"modulators\":null,\"redirect_of\":null}",
+   "facts": [
+    {
+     "tier": "director",
+     "argv": [
+      "~/.local/share/claude/versions/2.1.263",
+      "-p",
+      "--setting-sources",
+      "",
+      "--session-id",
+      "216e2e5a-40ae-417f-bfb0-7fc31540f87e",
+      "--model",
+      "claude-fable-5-1",
+      "--effort",
+      "high",
+      "--output-format",
+      "json",
+      "--json-schema",
+      "{\"$defs\":{\"Constraint\":{\"additionalProperties\":false,\"description\":\"Director → state; read by the gate and homeostasis (folded: T-14).\\n\\nTyped, never free text. `path_scope` and `allow_irreversible` are read by the veto\\npredicate, `budget` by homeostasis; seats read them as data and weigh them.\",\"properties\":{\"kind\":{\"$ref\":\"#/$defs/ConstraintKind\"},\"arguments\":{\"additionalProperties\":{\"$ref\":\"#/$defs/JsonValue\"},\"title\":\"Arguments\",\"type\":\"object\"},\"set_at_tick\":{\"title\":\"Set At Tick\",\"type\":\"integer\"}},\"required\":[\"kind\",\"set_at_tick\"],\"title\":\"Constraint\",\"type\":\"object\"},\"ConstraintKind\":{\"description\":\"Typed, never free text (§ Deliverable 2, `Constraint`).\",\"enum\":[\"path_scope\",\"allow_irreversible\",\"budget\"],\"title\":\"ConstraintKind\",\"type\":\"string\"},\"GoalItem\":{\"additionalProperties\":false,\"description\":\"The goal stack's element. Authoritative in state; the workspace's copy is a projection.\\n\\n`no_progress_ticks` is **derived** as `tick − last_progress_tick` and never stored\\n(folded: T-10) — a stored copy is a second source of truth that a resume can desynchronize.\\n`replan_count` and `redirect_count` are the ladder's rungs 2 and 3, counted here because a\\nresume that forgot how far it had climbed would restart the climb.\",\"properties\":{\"id\":{\"title\":\"Id\",\"type\":\"string\"},\"text\":{\"title\":\"Text\",\"type\":\"string\"},\"status\":{\"$ref\":\"#/$defs/GoalStatus\",\"default\":\"open\"},\"opened_at_tick\":{\"title\":\"Opened At Tick\",\"type\":\"integer\"},\"last_progress_tick\":{\"title\":\"Last Progress Tick\",\"type\":\"integer\"},\"replan_count\":{\"default\":0,\"title\":\"Replan Count\",\"type\":\"integer\"},\"redirect_count\":{\"default\":0,\"title\":\"Redirect Count\",\"type\":\"integer\"}},\"required\":[\"id\",\"text\",\"opened_at_tick\",\"last_progress_tick\"],\"title\":\"GoalItem\",\"type\":\"object\"},\"GoalStatus\":{\"description\":\"\\\"Goal stack empty\\\" means no `open` goal; closed items are retained.\",\"enum\":[\"open\",\"satisfied\",\"abandoned\"],\"title\":\"GoalStatus\",\"type\":\"string\"},\"InterruptKind\":{\"description\":\"The closed `kind` set, and there are exactly two licensed raisers\\n(§ Deliverable 5): `question` is a node's ordinary output, `stuck` is the runtime's.\",\"enum\":[\"question\",\"stuck\"],\"title\":\"InterruptKind\",\"type\":\"string\"},\"InterruptRequest\":{\"additionalProperties\":false,\"description\":\"A node's (or the runtime's) *request*, carried as ordinary output.\\n\\nOne per raiser per tick, so `(task, tick, raiser)` is unique. A seat's request travels\\ninside `SeatEnvelope.result` (folded: U-2).\",\"properties\":{\"kind\":{\"$ref\":\"#/$defs/InterruptKind\"},\"raised_by\":{\"$ref\":\"#/$defs/Raiser\"},\"question\":{\"title\":\"Question\",\"type\":\"string\"},\"evidence\":{\"additionalProperties\":{\"$ref\":\"#/$defs/JsonValue\"},\"title\":\"Evidence\",\"type\":\"object\"}},\"required\":[\"kind\",\"raised_by\",\"question\"],\"title\":\"InterruptRequest\",\"type\":\"object\"},\"JsonValue\":{},\"Modulators\":{\"additionalProperties\":false,\"description\":\"The §2.3 (d) state channel — the director's only nudge surface (`DIGEST:64`).\",\"properties\":{\"reward_error\":{\"default\":0.0,\"title\":\"Reward Error\",\"type\":\"number\"},\"arousal\":{\"default\":0.0,\"title\":\"Arousal\",\"type\":\"number\"},\"confidence\":{\"default\":0.0,\"title\":\"Confidence\",\"type\":\"number\"}},\"title\":\"Modulators\",\"type\":\"object\"},\"Raiser\":{\"description\":\"Who may raise. The runtime is licensed for `stuck` and for no other kind.\",\"enum\":[\"homeostasis\",\"hippocampus\",\"thalamus\",\"basal_ganglia\",\"anterior_cingulate\",\"director\",\"planner\",\"executor\",\"runtime\"],\"title\":\"Raiser\",\"type\":\"string\"}},\"additionalProperties\":false,\"description\":\"Director seat → runtime (folded: S-11). The only slice a director writes.\\n\\nGoal-stack edits, constraints and modulator fields — it never touches an executor and\\nnever approves an action (`DIGEST:64`). `redirect_of` is what rung 3 counts.\",\"properties\":{\"interrupt\":{\"anyOf\":[{\"$ref\":\"#/$defs/InterruptRequest\"},{\"type\":\"null\"}],\"default\":null},\"goals_pushed\":{\"items\":{\"$ref\":\"#/$defs/GoalItem\"},\"title\":\"Goals Pushed\",\"type\":\"array\"},\"goals_closed\":{\"items\":{\"type\":\"string\"},\"title\":\"Goals Closed\",\"type\":\"array\"},\"constraints\":{\"items\":{\"$ref\":\"#/$defs/Constraint\"},\"title\":\"Constraints\",\"type\":\"array\"},\"modulators\":{\"anyOf\":[{\"$ref\":\"#/$defs/Modulators\"},{\"type\":\"null\"}],\"default\":null},\"redirect_of\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}],\"default\":null,\"title\":\"Redirect Of\"},\"cited_ids\":{\"items\":{\"type\":\"string\"},\"title\":\"Cited Ids\",\"type\":\"array\"}},\"title\":\"DirectorDirection\",\"type\":\"object\"}",
+      "--system-prompt",
+      "# cortex\n\nThe sixth node folder, and the only one whose occupant is a model. Three tiers, three is the\nceiling: **director → planner → executor**. From build 2 the occupant is a real model session,\nspawned once per tier per tick behind the same port the scripted seats answered on — the folder\nexists so that the seat is graded like every other node, live or scripted.\n\nThis file is the seats' cached prefix: it is what every tier reads before it reads the tick, and\nit is followed by that tier's own `brain/seats/<tier>.md`. Both are seed files, hashed into the\ncheckpoint; neither is templated, and nothing per-tick is written here.\n\n**You are one node in a fixed cycle, not the loop.** Six nodes run in order every tick —\nhomeostasis, hippocampus, thalamus, basal ganglia, cortex, anterior cingulate — and you are the\nfifth. The five around you measure, fetch, veto and grade; you are the only one that chooses. A\ntick is your own work unit, never one tool call: the graph gates *between* ticks, and inside a\ntick you have your full harness.\n\n**You answer as structured JSON and nothing else.** The request arrives on stdin as one JSON\nobject; your answer is validated against the schema you were handed, and a shape that does not\nvalidate is retried exactly once before the tick refuses. Say what you did or decided in the\nfields the schema names — there is no channel beside them.\n\n**The director** reads only the compressed workspace and writes only goal-stack edits,\nconstraints and modulator fields. It never touches an executor and never approves an action.\n\n**The planner** decomposes into work units, minting each unit's stable `id` and reusing it\nwhen it re-plans that unit — the windows accumulate, which is the only thing that makes the\nladder's upper rungs reachable. It classifies the last mismatch, may dismiss a trap detector\nfor a unit, and resolves monitor escalations first.\n\n**The executor** ticks inside one work unit and returns what it observed of the workspace:\npath, existence, size, content hash. Observed, not asserted — the runtime derives state from the\nobservation, so a crash inside your call re-observes rather than trusting the invocation.\n\nAll three sessions are minted per task and checkpointed, so a resume in a new process reuses\nthem, and all three are discarded at task end. A later call in the same task resumes the same\nsession, so the prefix above is read once and cached for the rest of the task.\n\n**The operator sits above the director.** Anything you cannot decide is raised as an interrupt on your\nresult's `interrupt` slot; the runtime writes the mailbox file and stops. Silence is never\nassent, and no seat answers its own interrupt.\n\n## Reads\n\n- `tier`\n- `workspace`\n- `escalation`\n- `unit_id`\n- `trap_evidence`\n- `unit`\n- `admitted`\n- `workspace_path`\n\n## Writes\n\n`DirectorDirection` · `PlannerPlan` · `ExecutorSummary`, one per tier, each arriving inside a\n`SeatEnvelope` whose four measured facts are required fields — so a mock cannot be tidier than\nthe thing it stands in for.\n\n## Predicts\n\nOne record per tier per tick in which that tier ran, keyed by tier in this folder's\n`trace.jsonl`:\n\n- **executor** — the unit's `expected`, graded against this tick's `MonitorVerdict`;\n- **planner** — its `mismatch_class`, any `trap_dismissed`, and that the unit it emits will\n  pass its own `expected` within `planner_horizon` ticks, graded where the horizon closes;\n- **director** — that the redirect will restore goal-stack progress within `progress_window`,\n  graded where the window closes. This is the Misleading detector's own input.\n\nThe runtime mints one **synthetic** director-tier prediction at a `stuck` raise, and only when\nno director-tier record exists for that tick, so the operator's answer has a `ref` to grade against.\n\n## Weights\n\n`k_replan`, `k_redirect`, `planner_horizon`, `progress_window` — the ladder's counts, and\nnothing else. Every trap and streak threshold belongs to the anterior cingulate's file.\n\n# director\n\nYou are the **director** seat. You read the compressed workspace and nothing else, and you\nanswer with a `DirectorDirection`.\n\n**What you may write, and it is the whole list:** goals pushed onto the stack, goals closed,\nconstraints added, the modulator fields, and `redirect_of` when you are turning an open goal\naround. You never name a work unit, never approve an action, and never address an executor —\nthe planner decomposes and the executor acts, and neither of them reads you directly.\n\n**What you are graded on.** Every direction you give is a prediction: that a redirect restores\ngoal-stack progress inside `progress_window` ticks. The monitor grades it where the window\ncloses, so a redirect issued to look busy is scored as a miss, not as activity.\n\n**Read the workspace before you push.** A goal that duplicates an open one, or a constraint the\nconstraint list already carries, costs a tick and moves nothing. If the stack is already right,\nsay so with an empty direction — an empty answer is a legitimate tick.\n\n**Cite what you used.** `cited_ids` names the admitted items your direction actually rests on.\nThe thalamus is graded on whether what it admitted was used, and your citation is that grade's\nonly observable.\n\n**Raise rather than guess.** If the goal stack is ambiguous, or the workspace says the task's\npremise has changed, fill `interrupt` with the question and let the runtime stop. The operator sits\nabove you.\n\nYou run with **no tools and no working directory**. Everything you can know is on stdin.\n",
+      "--tools",
+      "",
+      "--max-budget-usd",
+      "1.0"
+     ],
+     "cli_version": "2.1.263 (Claude Code)",
+     "session_handle": "216e2e5a-40ae-417f-bfb0-7fc31540f87e",
+     "model": "claude-fable-5-1",
+     "effort": "high",
+     "permission_mode": null,
+     "request": {
+      "tier": "director",
+      "workspace": {
+       "task_id": "probe-tools-flag",
+       "tick": 1,
+       "goals": [
+        {
+         "id": "probe-tools-flag-g1",
+         "text": "confirm the seat wiring answers in its own schema",
+         "status": "open",
+         "opened_at_tick": 0,
+         "last_progress_tick": 0,
+         "replan_count": 0,
+         "redirect_count": 0
+        }
+       ],
+       "latest": {
+        "homeostasis": null,
+        "hippocampus": null,
+        "thalamus": null,
+        "basal_ganglia": null,
+        "anterior_cingulate": null,
+        "director": null,
+        "planner": null,
+        "executor": null
+       },
+       "admitted": null,
+       "last_mismatch_class": null,
+       "resolved_interrupts": [],
+       "modulators": {
+        "reward_error": 0.0,
+        "arousal": 0.0,
+        "confidence": 0.0
+       },
+       "constraints": []
+      }
+     },
+     "wall_seconds": 8.509,
+     "outcome": "ok",
+     "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 40486,
+      "cache_read_input_tokens": 0,
+      "output_tokens": 495,
+      "output_tokens_details": {
+       "thinking_tokens": 192
+      },
+      "server_tool_use": {
+       "web_search_requests": 0,
+       "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+       "ephemeral_1h_input_tokens": 40486,
+       "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "not_available",
+      "iterations": [
+       {
+        "input_tokens": 2,
+        "output_tokens": 495,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 40486,
+        "cache_creation": {
+         "ephemeral_5m_input_tokens": 0,
+         "ephemeral_1h_input_tokens": 40486
+        },
+        "type": "message"
+       }
+      ],
+      "speed": "standard"
+     },
+     "model_usage": {
+      "claude-haiku-4-5-20251001": {
+       "inputTokens": 1113,
+       "outputTokens": 12,
+       "cacheReadInputTokens": 0,
+       "cacheCreationInputTokens": 0,
+       "webSearchRequests": 0,
+       "costUSD": 0.001173,
+       "contextWindow": 200000,
+       "maxOutputTokens": 32000,
+       "thinkingTokens": 0,
+       "canonicalModel": "claude-haiku-4-5",
+       "provider": "firstParty",
+       "costBasis": "list"
+      },
+      "claude-fable-5-1": {
+       "inputTokens": 2,
+       "outputTokens": 495,
+       "cacheReadInputTokens": 0,
+       "cacheCreationInputTokens": 40486,
+       "webSearchRequests": 0,
+       "costUSD": 0.83449,
+       "contextWindow": 1000000,
+       "maxOutputTokens": 64000,
+       "thinkingTokens": 192,
+       "canonicalModel": "claude-fable-5-1",
+       "provider": "firstParty",
+       "costBasis": "list"
+      }
+     },
+     "num_turns": 2,
+     "error": ""
+    }
+   ],
+   "stdout": "{\"duration_api_ms\":8223,\"stop_reason\":\"tool_use\",\"session_id\":\"216e2e5a-40ae-417f-bfb0-7fc31540f87e\",\"total_cost_usd\":0.8356629999999999,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":40486,\"cache_read_input_tokens\":0,\"output_tokens\":495,\"output_tokens_details\":{\"thinking_tokens\":192},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":40486,\"ephemeral_5m_input_tokens\":0},\"inference_geo\":\"not_available\",\"iterations\":[{\"input_tokens\":2,\"output_tokens\":495,\"cache_read_input_tokens\":0,\"cache_creation_input_tokens\":40486,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":40486},\"type\":\"message\"}],\"speed\":\"standard\"},\"modelUsage\":{\"claude-haiku-4-5-20251001\":{\"inputTokens\":1113,\"outputTokens\":12,\"cacheReadInputTokens\":0,\"cacheCreationInputTokens\":0,\"webSearchRequests\":0,\"costUSD\":0.001173,\"contextWindow\":200000,\"maxOutputTokens\":32000,\"thinkingTokens\":0,\"canonicalModel\":\"claude-haiku-4-5\",\"provider\":\"firstParty\",\"costBasis\":\"list\"},\"claude-fable-5-1\":{\"inputTokens\":2,\"outputTokens\":495,\"cacheReadInputTokens\":0,\"cacheCreationInputTokens\":40486,\"webSearchRequests\":0,\"costUSD\":0.83449,\"contextWindow\":1000000,\"maxOutputTokens\":64000,\"thinkingTokens\":192,\"canonicalModel\":\"claude-fable-5-1\",\"provider\":\"firstParty\",\"costBasis\":\"list\"}},\"permission_denials\":[],\"terminal_reason\":\"completed\",\"fast_mode_state\":\"off\",\"fast_mode_disabled_reason\":\"sdk_opt_in_required\",\"subagent_stats\":{\"spawned\":0,\"requested\":{\"background\":0,\"foreground\":0,\"unset\":0},\"started_in_background\":0,\"max_depth\":0,\"spawned_by_subagents\":0,\"completed\":0,\"failed\":0,\"killed\":{\"parent\":0,\"user\":0,\"system\":0},\"refused\":{\"depth_limit\":0,\"concurrency_limit\":0,\"budget\":0},\"by_type\":{}},\"is_error\":false,\"num_turns\":2,\"subtype\":\"success\",\"api_error_status\":null,\"result\":\"{\\\"cited_ids\\\":[],\\\"constraints\\\":[],\\\"goals_closed\\\":[],\\\"goals_pushed\\\":[],\\\"interrupt\\\":null,\\\"modulators\\\":null,\\\"redirect_of\\\":null}\",\"structured_output\":{\"cited_ids\":[],\"constraints\":[],\"goals_closed\":[],\"goals_pushed\":[],\"interrupt\":null,\"modulators\":null,\"redirect_of\":null},\"ttft_ms\":4496,\"type\":\"result\",\"duration_ms\":7248,\"uuid\":\"f3879edc-56b0-4d20-9d35-f9e96d2a30f2\",\"ttft_stream_ms\":1835,\"time_to_request_ms\":14,\"first_content_frame_ms\":2175,\"queued_turn_count\":0}\n"
+  },
+  {
+   "tier": "planner",
+   "tools": "",
+   "env_passthrough": [
+    "PATH",
+    "HOME",
+    "LANG",
+    "TERM",
+    "USER"
+   ],
+   "structured": true,
+   "refusal": null,
+   "stop_reason": "tool_use",
+   "result": "{\"units\":[{\"id\":\"probe-tools-flag-u1\",\"goal_id\":\"probe-tools-flag-g1\",\"intent\":\"Executor writes a single probe artifact at workspace-relative path 'probe_tools_flag.txt' containing the literal task id 'probe-tools-flag', then returns its observation of that path (existence, size, content hash). Smallest unit that proves seat wiring end-to-end and closes the empty unit stack.\",\"irreversible\":false,\"revision\":0,\"status\":\"pending\",\"expected\":[{\"id\":\"probe-tools-flag-u1-e1\",\"kind\":\"file_exists\",\"arguments\":{\"path\":\"probe_tools_flag.txt\"}},{\"id\":\"probe-tools-flag-u1-e2\",\"kind\":\"file_contains\",\"arguments\":{\"path\":\"probe_tools_flag.txt\",\"text\":\"probe-tools-flag\"}},{\"id\":\"probe-tools-flag-u1-e3\",\"kind\":\"summary_field_equals\",\"arguments\":{\"field\":\"path\",\"value\":\"probe_tools_flag.txt\"}}],\"constraints\":[{\"kind\":\"path_scope\",\"set_at_tick\":1,\"arguments\":{\"paths\":[\"probe_tools_flag.txt\"],\"mode\":\"allow_only\"}},{\"kind\":\"allow_irreversible\",\"set_at_tick\":1,\"arguments\":{\"value\":false}},{\"kind\":\"budget\",\"set_at_tick\":1,\"arguments\":{\"max_ticks\":2}}]}],\"mismatch_class\":null,\"trap_dismissed\":[],\"goals_satisfied\":[],\"cited_ids\":[\"probe-tools-flag-g1\",\"empty_unit_stack\"],\"interrupt\":null}",
+   "facts": [
+    {
+     "tier": "planner",
+     "argv": [
+      "~/.local/share/claude/versions/2.1.263",
+      "-p",
+      "--setting-sources",
+      "",
+      "--session-id",
+      "54eb477f-a23d-4049-8298-c01dd4642293",
+      "--model",
+      "claude-opus-5",
+      "--effort",
+      "high",
+      "--output-format",
+      "json",
+      "--json-schema",
+      "{\"$defs\":{\"Constraint\":{\"additionalProperties\":false,\"description\":\"Director → state; read by the gate and homeostasis (folded: T-14).\\n\\nTyped, never free text. `path_scope` and `allow_irreversible` are read by the veto\\npredicate, `budget` by homeostasis; seats read them as data and weigh them.\",\"properties\":{\"kind\":{\"$ref\":\"#/$defs/ConstraintKind\"},\"arguments\":{\"additionalProperties\":{\"$ref\":\"#/$defs/JsonValue\"},\"title\":\"Arguments\",\"type\":\"object\"},\"set_at_tick\":{\"title\":\"Set At Tick\",\"type\":\"integer\"}},\"required\":[\"kind\",\"set_at_tick\"],\"title\":\"Constraint\",\"type\":\"object\"},\"ConstraintKind\":{\"description\":\"Typed, never free text (§ Deliverable 2, `Constraint`).\",\"enum\":[\"path_scope\",\"allow_irreversible\",\"budget\"],\"title\":\"ConstraintKind\",\"type\":\"string\"},\"Expectation\":{\"additionalProperties\":false,\"description\":\"Planner → monitor. The monitor's build-1 comparator (folded: A1-14, folded: S-7).\\n\\nOne deterministic predicate over an `ExecutorSummary`, evaluated mechanically. Build 2's\\noracle emits the same type as a second source, which is the whole point of typing it\\nhere rather than letting the monitor judge.\",\"properties\":{\"id\":{\"title\":\"Id\",\"type\":\"string\"},\"kind\":{\"$ref\":\"#/$defs/ExpectationKind\"},\"arguments\":{\"additionalProperties\":{\"$ref\":\"#/$defs/JsonValue\"},\"title\":\"Arguments\",\"type\":\"object\"}},\"required\":[\"id\",\"kind\"],\"title\":\"Expectation\",\"type\":\"object\"},\"ExpectationKind\":{\"description\":\"One deterministic predicate over an `ExecutorSummary` (§ Deliverable 2).\",\"enum\":[\"file_exists\",\"file_absent\",\"file_contains\",\"summary_field_equals\",\"exit_code\"],\"title\":\"ExpectationKind\",\"type\":\"string\"},\"InterruptKind\":{\"description\":\"The closed `kind` set, and there are exactly two licensed raisers\\n(§ Deliverable 5): `question` is a node's ordinary output, `stuck` is the runtime's.\",\"enum\":[\"question\",\"stuck\"],\"title\":\"InterruptKind\",\"type\":\"string\"},\"InterruptRequest\":{\"additionalProperties\":false,\"description\":\"A node's (or the runtime's) *request*, carried as ordinary output.\\n\\nOne per raiser per tick, so `(task, tick, raiser)` is unique. A seat's request travels\\ninside `SeatEnvelope.result` (folded: U-2).\",\"properties\":{\"kind\":{\"$ref\":\"#/$defs/InterruptKind\"},\"raised_by\":{\"$ref\":\"#/$defs/Raiser\"},\"question\":{\"title\":\"Question\",\"type\":\"string\"},\"evidence\":{\"additionalProperties\":{\"$ref\":\"#/$defs/JsonValue\"},\"title\":\"Evidence\",\"type\":\"object\"}},\"required\":[\"kind\",\"raised_by\",\"question\"],\"title\":\"InterruptRequest\",\"type\":\"object\"},\"JsonValue\":{},\"MismatchClass\":{\"description\":\"The planner classifies the mismatch; the monitor never does (folded: S-12).\",\"enum\":[\"approach_wrong\",\"execution_slip\"],\"title\":\"MismatchClass\",\"type\":\"string\"},\"Raiser\":{\"description\":\"Who may raise. The runtime is licensed for `stuck` and for no other kind.\",\"enum\":[\"homeostasis\",\"hippocampus\",\"thalamus\",\"basal_ganglia\",\"anterior_cingulate\",\"director\",\"planner\",\"executor\",\"runtime\"],\"title\":\"Raiser\",\"type\":\"string\"},\"TrapDetector\":{\"description\":\"Six of the eight metacognitive traps, measurable from what the loop records.\",\"enum\":[\"dislodging\",\"forming\",\"location\",\"interruption\",\"misleading\",\"progression\"],\"title\":\"TrapDetector\",\"type\":\"string\"},\"UnitStatus\":{\"description\":\"A `match` verdict sets `passed`; the planner may set `abandoned`.\",\"enum\":[\"pending\",\"active\",\"passed\",\"abandoned\"],\"title\":\"UnitStatus\",\"type\":\"string\"},\"WorkUnit\":{\"additionalProperties\":false,\"description\":\"Inside `PlannerPlan`, and stored on `BrainState.units`.\\n\\n`id` is minted by the planner and survives a re-plan; `revision` increments instead\\n(decision 28). `irreversible` is the planner's declaration the gate reads — the gate does\\nnot infer it (folded: T-13).\",\"properties\":{\"id\":{\"title\":\"Id\",\"type\":\"string\"},\"revision\":{\"default\":0,\"title\":\"Revision\",\"type\":\"integer\"},\"goal_id\":{\"title\":\"Goal Id\",\"type\":\"string\"},\"status\":{\"$ref\":\"#/$defs/UnitStatus\",\"default\":\"pending\"},\"intent\":{\"title\":\"Intent\",\"type\":\"string\"},\"irreversible\":{\"default\":false,\"title\":\"Irreversible\",\"type\":\"boolean\"},\"constraints\":{\"items\":{\"$ref\":\"#/$defs/Constraint\"},\"title\":\"Constraints\",\"type\":\"array\"},\"expected\":{\"items\":{\"$ref\":\"#/$defs/Expectation\"},\"title\":\"Expected\",\"type\":\"array\"}},\"required\":[\"id\",\"goal_id\",\"intent\"],\"title\":\"WorkUnit\",\"type\":\"object\"}},\"additionalProperties\":false,\"description\":\"Planner seat → runtime (folded: S-11, folded: S-12).\\n\\nWork units with ids minted here and kept across re-plans; the mismatch classification the\\nmonitor never makes; and `trap_dismissed`, which resets a detector's window for a unit and\\nis itself a prediction the planner is graded on (Ruling 16 (a) and (c)).\",\"properties\":{\"interrupt\":{\"anyOf\":[{\"$ref\":\"#/$defs/InterruptRequest\"},{\"type\":\"null\"}],\"default\":null},\"units\":{\"items\":{\"$ref\":\"#/$defs/WorkUnit\"},\"title\":\"Units\",\"type\":\"array\"},\"goals_satisfied\":{\"items\":{\"type\":\"string\"},\"title\":\"Goals Satisfied\",\"type\":\"array\"},\"mismatch_class\":{\"anyOf\":[{\"$ref\":\"#/$defs/MismatchClass\"},{\"type\":\"null\"}],\"default\":null},\"trap_dismissed\":{\"items\":{\"$ref\":\"#/$defs/TrapDetector\"},\"title\":\"Trap Dismissed\",\"type\":\"array\"},\"cited_ids\":{\"items\":{\"type\":\"string\"},\"title\":\"Cited Ids\",\"type\":\"array\"}},\"title\":\"PlannerPlan\",\"type\":\"object\"}",
+      "--system-prompt",
+      "# cortex\n\nThe sixth node folder, and the only one whose occupant is a model. Three tiers, three is the\nceiling: **director → planner → executor**. From build 2 the occupant is a real model session,\nspawned once per tier per tick behind the same port the scripted seats answered on — the folder\nexists so that the seat is graded like every other node, live or scripted.\n\nThis file is the seats' cached prefix: it is what every tier reads before it reads the tick, and\nit is followed by that tier's own `brain/seats/<tier>.md`. Both are seed files, hashed into the\ncheckpoint; neither is templated, and nothing per-tick is written here.\n\n**You are one node in a fixed cycle, not the loop.** Six nodes run in order every tick —\nhomeostasis, hippocampus, thalamus, basal ganglia, cortex, anterior cingulate — and you are the\nfifth. The five around you measure, fetch, veto and grade; you are the only one that chooses. A\ntick is your own work unit, never one tool call: the graph gates *between* ticks, and inside a\ntick you have your full harness.\n\n**You answer as structured JSON and nothing else.** The request arrives on stdin as one JSON\nobject; your answer is validated against the schema you were handed, and a shape that does not\nvalidate is retried exactly once before the tick refuses. Say what you did or decided in the\nfields the schema names — there is no channel beside them.\n\n**The director** reads only the compressed workspace and writes only goal-stack edits,\nconstraints and modulator fields. It never touches an executor and never approves an action.\n\n**The planner** decomposes into work units, minting each unit's stable `id` and reusing it\nwhen it re-plans that unit — the windows accumulate, which is the only thing that makes the\nladder's upper rungs reachable. It classifies the last mismatch, may dismiss a trap detector\nfor a unit, and resolves monitor escalations first.\n\n**The executor** ticks inside one work unit and returns what it observed of the workspace:\npath, existence, size, content hash. Observed, not asserted — the runtime derives state from the\nobservation, so a crash inside your call re-observes rather than trusting the invocation.\n\nAll three sessions are minted per task and checkpointed, so a resume in a new process reuses\nthem, and all three are discarded at task end. A later call in the same task resumes the same\nsession, so the prefix above is read once and cached for the rest of the task.\n\n**The operator sits above the director.** Anything you cannot decide is raised as an interrupt on your\nresult's `interrupt` slot; the runtime writes the mailbox file and stops. Silence is never\nassent, and no seat answers its own interrupt.\n\n## Reads\n\n- `tier`\n- `workspace`\n- `escalation`\n- `unit_id`\n- `trap_evidence`\n- `unit`\n- `admitted`\n- `workspace_path`\n\n## Writes\n\n`DirectorDirection` · `PlannerPlan` · `ExecutorSummary`, one per tier, each arriving inside a\n`SeatEnvelope` whose four measured facts are required fields — so a mock cannot be tidier than\nthe thing it stands in for.\n\n## Predicts\n\nOne record per tier per tick in which that tier ran, keyed by tier in this folder's\n`trace.jsonl`:\n\n- **executor** — the unit's `expected`, graded against this tick's `MonitorVerdict`;\n- **planner** — its `mismatch_class`, any `trap_dismissed`, and that the unit it emits will\n  pass its own `expected` within `planner_horizon` ticks, graded where the horizon closes;\n- **director** — that the redirect will restore goal-stack progress within `progress_window`,\n  graded where the window closes. This is the Misleading detector's own input.\n\nThe runtime mints one **synthetic** director-tier prediction at a `stuck` raise, and only when\nno director-tier record exists for that tick, so the operator's answer has a `ref` to grade against.\n\n## Weights\n\n`k_replan`, `k_redirect`, `planner_horizon`, `progress_window` — the ladder's counts, and\nnothing else. Every trap and streak threshold belongs to the anterior cingulate's file.\n\n# planner\n\nYou are the **planner** seat. You read the compressed workspace, the escalation that put you on\nthis tick, and the trap evidence for the unit in question, and you answer with a `PlannerPlan`.\n\n**Ids are stable and that is load-bearing.** When you re-plan a unit you already minted, reuse\nits `id`; the runtime increments its `revision` and its trap windows accumulate. A fresh id on a\nre-plan resets those windows and makes the monitor's upper rungs unreachable, which is the one\nmistake in this seat that cannot be recovered later in the task.\n\n**Resolve the escalation first.** You were called because a rung fired — an empty unit stack, a\nmismatch the monitor could not classify, a trap that kept firing. Answer that before you add\nwork. `mismatch_class` is yours and no one else's: the monitor observes the mismatch, you say\nwhat kind it was.\n\n**A unit carries its own acceptance.** Every `WorkUnit` names `expected` predicates that a later\ntick can grade mechanically — a file that exists, a summary field that equals a value, an exit\ncode. A unit with no gradeable expectation cannot pass, so it cannot close.\n\n**`trap_dismissed` is a claim, not a mute.** Dismissing a detector for a unit resets that\ndetector's window and is itself a prediction you are graded on. Dismiss when the evidence is a\nfalse positive; escalate when it is not.\n\n**Cite what you used** in `cited_ids`, and **raise rather than guess**: an ambiguous goal or a\nmissing premise goes on `interrupt` and the runtime stops.\n\nYou run with **no tools and no working directory**. Everything you can know is on stdin.\n",
+      "--tools",
+      "",
+      "--max-budget-usd",
+      "2.0"
+     ],
+     "cli_version": "2.1.263 (Claude Code)",
+     "session_handle": "54eb477f-a23d-4049-8298-c01dd4642293",
+     "model": "claude-opus-5",
+     "effort": "high",
+     "permission_mode": null,
+     "request": {
+      "tier": "planner",
+      "workspace": {
+       "task_id": "probe-tools-flag",
+       "tick": 1,
+       "goals": [
+        {
+         "id": "probe-tools-flag-g1",
+         "text": "confirm the seat wiring answers in its own schema",
+         "status": "open",
+         "opened_at_tick": 0,
+         "last_progress_tick": 0,
+         "replan_count": 0,
+         "redirect_count": 0
+        }
+       ],
+       "latest": {
+        "homeostasis": null,
+        "hippocampus": null,
+        "thalamus": null,
+        "basal_ganglia": null,
+        "anterior_cingulate": null,
+        "director": null,
+        "planner": null,
+        "executor": null
+       },
+       "admitted": null,
+       "last_mismatch_class": null,
+       "resolved_interrupts": [],
+       "modulators": {
+        "reward_error": 0.0,
+        "arousal": 0.0,
+        "confidence": 0.0
+       },
+       "constraints": []
+      },
+      "escalation": "empty_unit_stack",
+      "unit_id": null,
+      "trap_evidence": []
+     },
+     "wall_seconds": 22.627,
+     "outcome": "ok",
+     "usage": {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 42305,
+      "cache_read_input_tokens": 40940,
+      "output_tokens": 1990,
+      "output_tokens_details": {
+       "thinking_tokens": 622
+      },
+      "server_tool_use": {
+       "web_search_requests": 0,
+       "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+       "ephemeral_1h_input_tokens": 42305,
+       "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "not_available",
+      "iterations": [
+       {
+        "input_tokens": 2,
+        "output_tokens": 718,
+        "cache_read_input_tokens": 40940,
+        "cache_creation_input_tokens": 1365,
+        "cache_creation": {
+         "ephemeral_5m_input_tokens": 0,
+         "ephemeral_1h_input_tokens": 1365
+        },
+        "type": "message"
+       }
+      ],
+      "speed": "standard"
+     },
+     "model_usage": {
+      "claude-haiku-4-5-20251001": {
+       "inputTokens": 1139,
+       "outputTokens": 14,
+       "cacheReadInputTokens": 0,
+       "cacheCreationInputTokens": 0,
+       "webSearchRequests": 0,
+       "costUSD": 0.001209,
+       "contextWindow": 200000,
+       "maxOutputTokens": 32000,
+       "thinkingTokens": 0,
+       "canonicalModel": "claude-haiku-4-5",
+       "provider": "firstParty",
+       "costBasis": "list"
+      },
+      "claude-opus-5": {
+       "inputTokens": 4,
+       "outputTokens": 1990,
+       "cacheReadInputTokens": 40940,
+       "cacheCreationInputTokens": 42305,
+       "webSearchRequests": 0,
+       "costUSD": 0.49329,
+       "contextWindow": 1000000,
+       "maxOutputTokens": 64000,
+       "thinkingTokens": 622,
+       "canonicalModel": "claude-opus-5",
+       "provider": "firstParty",
+       "costBasis": "list"
+      }
+     },
+     "num_turns": 3,
+     "error": ""
+    }
+   ],
+   "stdout": "{\"duration_api_ms\":22412,\"stop_reason\":\"tool_use\",\"session_id\":\"54eb477f-a23d-4049-8298-c01dd4642293\",\"total_cost_usd\":0.494499,\"usage\":{\"input_tokens\":4,\"cache_creation_input_tokens\":42305,\"cache_read_input_tokens\":40940,\"output_tokens\":1990,\"output_tokens_details\":{\"thinking_tokens\":622},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":42305,\"ephemeral_5m_input_tokens\":0},\"inference_geo\":\"not_available\",\"iterations\":[{\"input_tokens\":2,\"output_tokens\":718,\"cache_read_input_tokens\":40940,\"cache_creation_input_tokens\":1365,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":1365},\"type\":\"message\"}],\"speed\":\"standard\"},\"modelUsage\":{\"claude-haiku-4-5-20251001\":{\"inputTokens\":1139,\"outputTokens\":14,\"cacheReadInputTokens\":0,\"cacheCreationInputTokens\":0,\"webSearchRequests\":0,\"costUSD\":0.001209,\"contextWindow\":200000,\"maxOutputTokens\":32000,\"thinkingTokens\":0,\"canonicalModel\":\"claude-haiku-4-5\",\"provider\":\"firstParty\",\"costBasis\":\"list\"},\"claude-opus-5\":{\"inputTokens\":4,\"outputTokens\":1990,\"cacheReadInputTokens\":40940,\"cacheCreationInputTokens\":42305,\"webSearchRequests\":0,\"costUSD\":0.49329,\"contextWindow\":1000000,\"maxOutputTokens\":64000,\"thinkingTokens\":622,\"canonicalModel\":\"claude-opus-5\",\"provider\":\"firstParty\",\"costBasis\":\"list\"}},\"permission_denials\":[],\"terminal_reason\":\"completed\",\"fast_mode_state\":\"off\",\"fast_mode_disabled_reason\":\"sdk_opt_in_required\",\"subagent_stats\":{\"spawned\":0,\"requested\":{\"background\":0,\"foreground\":0,\"unset\":0},\"started_in_background\":0,\"max_depth\":0,\"spawned_by_subagents\":0,\"completed\":0,\"failed\":0,\"killed\":{\"parent\":0,\"user\":0,\"system\":0},\"refused\":{\"depth_limit\":0,\"concurrency_limit\":0,\"budget\":0},\"by_type\":{}},\"is_error\":false,\"num_turns\":3,\"subtype\":\"success\",\"api_error_status\":null,\"result\":\"{\\\"units\\\":[{\\\"id\\\":\\\"probe-tools-flag-u1\\\",\\\"goal_id\\\":\\\"probe-tools-flag-g1\\\",\\\"intent\\\":\\\"Executor writes a single probe artifact at workspace-relative path 'probe_tools_flag.txt' containing the literal task id 'probe-tools-flag', then returns its observation of that path (existence, size, content hash). Smallest unit that proves seat wiring end-to-end and closes the empty unit stack.\\\",\\\"irreversible\\\":false,\\\"revision\\\":0,\\\"status\\\":\\\"pending\\\",\\\"expected\\\":[{\\\"id\\\":\\\"probe-tools-flag-u1-e1\\\",\\\"kind\\\":\\\"file_exists\\\",\\\"arguments\\\":{\\\"path\\\":\\\"probe_tools_flag.txt\\\"}},{\\\"id\\\":\\\"probe-tools-flag-u1-e2\\\",\\\"kind\\\":\\\"file_contains\\\",\\\"arguments\\\":{\\\"path\\\":\\\"probe_tools_flag.txt\\\",\\\"text\\\":\\\"probe-tools-flag\\\"}},{\\\"id\\\":\\\"probe-tools-flag-u1-e3\\\",\\\"kind\\\":\\\"summary_field_equals\\\",\\\"arguments\\\":{\\\"field\\\":\\\"path\\\",\\\"value\\\":\\\"probe_tools_flag.txt\\\"}}],\\\"constraints\\\":[{\\\"kind\\\":\\\"path_scope\\\",\\\"set_at_tick\\\":1,\\\"arguments\\\":{\\\"paths\\\":[\\\"probe_tools_flag.txt\\\"],\\\"mode\\\":\\\"allow_only\\\"}},{\\\"kind\\\":\\\"allow_irreversible\\\",\\\"set_at_tick\\\":1,\\\"arguments\\\":{\\\"value\\\":false}},{\\\"kind\\\":\\\"budget\\\",\\\"set_at_tick\\\":1,\\\"arguments\\\":{\\\"max_ticks\\\":2}}]}],\\\"mismatch_class\\\":null,\\\"trap_dismissed\\\":[],\\\"goals_satisfied\\\":[],\\\"cited_ids\\\":[\\\"probe-tools-flag-g1\\\",\\\"empty_unit_stack\\\"],\\\"interrupt\\\":null}\",\"structured_output\":{\"units\":[{\"id\":\"probe-tools-flag-u1\",\"goal_id\":\"probe-tools-flag-g1\",\"intent\":\"Executor writes a single probe artifact at workspace-relative path 'probe_tools_flag.txt' containing the literal task id 'probe-tools-flag', then returns its observation of that path (existence, size, content hash). Smallest unit that proves seat wiring end-to-end and closes the empty unit stack.\",\"irreversible\":false,\"revision\":0,\"status\":\"pending\",\"expected\":[{\"id\":\"probe-tools-flag-u1-e1\",\"kind\":\"file_exists\",\"arguments\":{\"path\":\"probe_tools_flag.txt\"}},{\"id\":\"probe-tools-flag-u1-e2\",\"kind\":\"file_contains\",\"arguments\":{\"path\":\"probe_tools_flag.txt\",\"text\":\"probe-tools-flag\"}},{\"id\":\"probe-tools-flag-u1-e3\",\"kind\":\"summary_field_equals\",\"arguments\":{\"field\":\"path\",\"value\":\"probe_tools_flag.txt\"}}],\"constraints\":[{\"kind\":\"path_scope\",\"set_at_tick\":1,\"arguments\":{\"paths\":[\"probe_tools_flag.txt\"],\"mode\":\"allow_only\"}},{\"kind\":\"allow_irreversible\",\"set_at_tick\":1,\"arguments\":{\"value\":false}},{\"kind\":\"budget\",\"set_at_tick\":1,\"arguments\":{\"max_ticks\":2}}]}],\"mismatch_class\":null,\"trap_dismissed\":[],\"goals_satisfied\":[],\"cited_ids\":[\"probe-tools-flag-g1\",\"empty_unit_stack\"],\"interrupt\":null},\"ttft_ms\":8632,\"type\":\"result\",\"duration_ms\":21577,\"uuid\":\"951a46ae-f244-4b73-8645-05a809f2976b\",\"ttft_stream_ms\":897,\"time_to_request_ms\":14,\"first_content_frame_ms\":1332,\"queued_turn_count\":0}\n"
+  }
+ ]
+}

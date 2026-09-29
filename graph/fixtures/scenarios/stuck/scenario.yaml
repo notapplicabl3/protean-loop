@@ -1,0 +1,17 @@
+# The stuck scenario: a goal the scripted seats cannot satisfy, and the ladder that gives up on
+# it in the one way the SPEC allows — a mailbox interrupt to the operator carrying the evidence.
+#
+# `the build specification (not in this mirror)` § Deliverable 3's `stuck` terminal row and § Deliverable 6's
+# ladder. The run climbs unit -> planner -> director and commits `stuck`; the runtime writes ONE
+# mailbox item of kind `stuck`, `raised_by: runtime`, carrying which signals fired, on which
+# units, and for how long. Resolving it resets the exhausted goal's ladder counters and its
+# units' windows, and the resumed run closes the goal.
+#
+# The scenario names its responders by stem, never by path, so it holds no machine-specific
+# string; and it states no count and no threshold, because how long the climb takes is decided
+# by `brain/nodes/cortex/weights.yaml` and `brain/nodes/anterior_cingulate/weights.yaml` — the
+# same two files the runtime reads.
+
+name: stuck
+goal: reconcile the ledger against the statement and report the difference
+seat_script: stuck_ladder

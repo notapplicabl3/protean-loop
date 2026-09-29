@@ -1,0 +1,59 @@
+# Anterior cingulate — conflict monitoring, and the six trap detectors.
+#
+# `the build specification (not in this mirror)` § Deliverable 4's trap table names every key below, and
+# § Deliverable 6 fixes the single-owner rule: the trap and streak thresholds live HERE, beside
+# the detectors that compute them, and the ladder counts live in the cortex's weights. Nothing
+# in `src/protean/nodes/` restates any of these numbers — they reach the node on `MonitorInput`.
+#
+# `window_len` is DERIVED, never written here: `max(rut_ticks, forming_ticks, rework_window,
+# abandon_window, mislead_window) + 1`, so retuning a threshold retunes the window.
+#
+# Ruling 16 (b), the operator's over-firing constraint verbatim — "make sure this isn't over-firing, we
+# don't want metaphorical 'over thinking' when we haven't actually reached a stuck state yet."
+# Every value below is seeded conservatively: firing takes persistence across ticks, and no
+# detector can trip on one tick. `rut_ticks` is the exception and it is the operator's own number —
+# digest Q2's "two consecutive mismatches", preserved as a value while Ruling 16's layered
+# shape moved its destination to rung 1, the planner. It appears in exactly one weights file in
+# the whole brain, and this is that file.
+
+# Dislodging — stuck in a rut, band-aids on a broken bone.
+rut_ticks: 2
+rut_delta_max: 32
+
+# Forming — right problem, wrong approach.
+forming_ticks: 6
+
+# Location — a crucial early step skipped, paid for as late structural rework.
+rework_spike_ratio: 8.0
+rework_window: 6
+
+# Interruption — the train of thought broken.
+abandon_count: 5
+abandon_window: 12
+
+# Misleading — bad advice followed.
+mislead_window: 8
+mislead_rise: 0.5
+
+# Progression — output beyond what is understood.
+uncited_ratio: 0.8
+
+# The router's streak threshold: how many consecutive mismatches escalate to the planner.
+mismatch_streak: 3
+
+# Conditional firing, build A.1 (`the build specification (not in this mirror)` § Deliverable 1). The
+# node's cheap check fires — the node does its work — when its score is **>= this number**, so
+# **raising** it makes the node skip more. Seeded at zero: A.1 lands the mechanism and the
+# default is that every node works exactly as it did before, which is the only seed under which
+# "conditional firing" adds a capability rather than silently subtracting one. The offline sleep
+# graph is its only writer, on `firing_check`'s own strict loosening arm.
+firing_threshold: 0.0
+
+# The think trigger, build A.2.i (`the build specification (not in this mirror)` § Deliverable 1, the
+# anterior cingulate rule). This node plans one think call when the count of predicates it grades
+# against a summary this tick is **>= this number**, in series behind `firing_threshold` above,
+# which reads a different score. **Shipped off**: `null` (or the key absent) plans nothing, so no
+# outer node calls on the shipping seed. The key is static — no sleep rule names it. The on-value
+# is the operator's named seed edit at their go (row B63), never a builder's default; an on-value is a
+# positive number, and anything else is refused at task start.
+think_threshold: null

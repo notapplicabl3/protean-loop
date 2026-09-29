@@ -1,0 +1,29 @@
+# Arm 2: an update withheld by k.
+#
+# The same two pairs as arm 1 with no earlier task in project memory, so the window holds two
+# admissible pairs where the floor asks three. The operator's over-firing constraint (`DIGEST:96` [B])
+# applied to a learner: a threshold they set does not move on two observations.
+
+arm: update-withheld-by-k
+about: two admissible pairs where the tightening floor asks three — withheld, with its arithmetic
+
+run:
+  task: task-fixture
+  final_tick: 4
+  terminal: done
+  pairs:
+    - {kind: hippocampus_citation, tick: 1, matched: true}
+    - {kind: hippocampus_citation, tick: 2, matched: false}
+
+claims:
+  pairs: 2
+  admissible: 2
+  applied: []
+  withheld:
+    - {node: hippocampus, key: candidate_window, direction: tighten, because: "floor k: 2 admissible pair(s)"}
+    - {node: hippocampus, key: semantic_window, direction: tighten, because: "3 required to tighten"}
+    - {node: hippocampus, key: semantic_min_overlap, direction: tighten, because: "floor k: 2 admissible pair(s)"}
+  procedures_written: []
+  procedures_withdrawn: []
+  files_written:
+    - projects/_root/memory/hippocampus/learning.jsonl

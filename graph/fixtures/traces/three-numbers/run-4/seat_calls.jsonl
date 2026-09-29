@@ -1,0 +1,4 @@
+{"schema_version":3,"task":"task-run-4","tick":1,"node":"homeostasis","call_number":1,"tier":"think","model":"claude-fable-5-1","outcome":"decode_retry","model_usage":{"claude-fable-5-1":{"costUSD":0.0625}}}
+{"schema_version":3,"task":"task-run-4","tick":1,"node":"homeostasis","call_number":1,"tier":"think","model":"claude-fable-5-1","outcome":"ok","model_usage":{"claude-fable-5-1":{"costUSD":0.125}}}
+{"schema_version":3,"task":"task-run-4","tick":1,"node":"cortex","call_number":1,"tier":"manager","ref":"task-run-4:1:cortex:manager:prediction","model":"claude-opus-5","outcome":"ok","model_usage":{"claude-opus-5":{"costUSD":1.25}}}
+{"schema_version":3,"task":"task-run-4","tick":1,"node":"anterior_cingulate","call_number":1,"tier":"think","model":"claude-fable-5-1","outcome":"ok","model_usage":{"claude-fable-5-1":{"costUSD":0.125}}}

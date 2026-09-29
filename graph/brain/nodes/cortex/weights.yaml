@@ -1,0 +1,16 @@
+# Cortex — the sixth node folder (decision 23), and the ladder's counts.
+#
+# `the build specification (not in this mirror)` § Deliverable 6, re-based by build A.1 (folded: S-A60):
+# "`brain/nodes/cortex/weights.yaml` carries only `k_replan`, `k_redirect`, `manager_horizon`,
+# `progress_window`." Every trap and streak threshold belongs to the anterior cingulate's file —
+# each threshold has exactly one owner, and `rut_ticks` in particular exists in exactly one file
+# in the whole brain, which is not this one.
+#
+# The ladder (Ruling 16): rung 1 is always the manager; `k_replan` re-plans of the same goal
+# item with no predicate progress climb to the director; `k_redirect` redirects with no
+# goal-stack progress end the task `stuck`. Both default high — the whole-brain stop is the
+# last thing that should fire.
+k_replan: 3
+k_redirect: 2
+manager_horizon: 4
+progress_window: 8

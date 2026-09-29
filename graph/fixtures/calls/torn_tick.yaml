@@ -1,0 +1,79 @@
+# torn_tick — a tick with three calls in it, for the replay contract's own battery.
+#
+# `the build specification (not in this mirror)` § Deliverable 6 (row G7): "a tick torn after call 2 of 3
+# replays calls 1–2 from the journal and re-invokes only call 3". The three are the tick's, in
+# the order the tick makes them — the node steps come before the cortex's, so:
+#
+#   call 1  homeostasis → think      (journalled under `(task, tick, homeostasis, 1)`)
+#   call 2  hippocampus → delegate   (journalled under `(task, tick, hippocampus, 1)`)
+#   call 3  the cortex  → the seat   (journalled under `(task, tick, cortex, 1)`)
+#
+# Each node's counter is its own, which is why all three are `call# = 1`: `call#` is per node
+# within the tick and `0` is the reserved key of the node's **own output** entry.
+#
+# **Two calls rather than three node calls**, unlike `three_call_types.yaml`, so the tick holds
+# exactly the three G7's clause names and the tear falls between call 2 and call 3 — which is
+# the seat call, and the one a torn pass can be torn *inside* (an outer node's call refuses
+# rather than tearing: every fault on a think, an escalate or a delegate is a signal returned to
+# the calling node, § Deliverable 2).
+#
+# **Nothing here spends.** The responses are scripted, the transport is order W2's, and a replay
+# makes no call by construction — the recording shim's log stays at zero bytes across the whole
+# module.
+
+name: torn_tick
+
+responses:
+  # The opening seat call: the unit stack is empty and there is nothing to act on yet. There is
+  # deliberately **no** manager response for the non-escalated acting tick — that response is
+  # order W8's, and this battery never reaches a second tick.
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    result:
+      emitter: manager
+      units:
+        - id: u-torn-1
+          goal_id: $goal
+          intent: write the note the goal asks for
+          expected:
+            - id: e-torn-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.5
+
+  # call 1 — homeostasis asks its own question and folds the answer in as a signal.
+  - tier: think
+    result:
+      emitter: think
+      answer: the ceiling is far off and the last three ticks were cheap
+      confidence: 0.6
+
+  # call 2 — the hippocampus asks a specialized subagent for a verdict. Scripted: no A.1 fixture
+  # creates a tier-three process at all (row G12).
+  - tier: delegate
+    result:
+      emitter: delegate
+      kind: reviewer
+      verdict: the retrieval window is wide enough
+      information: nothing in the last three episodes contradicts the unit
+
+calls:
+  - node: homeostasis
+    type: think
+    payload:
+      question: is this tick's spend near the ceiling?
+      context: the tick's own counters
+  - node: hippocampus
+    type: delegate
+    payload:
+      kind: reviewer
+      question: does anything retrieved contradict the open unit?

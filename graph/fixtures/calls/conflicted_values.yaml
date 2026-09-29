@@ -1,0 +1,95 @@
+# conflicted_values — two members of one wave disagreeing about **one predicate id**.
+#
+# `the build specification (not in this mirror)` § Deliverable 3: "`expectation_values` merged **per
+# predicate id**, any disagreement on one id marking the wave `conflicted`". The other half of
+# the conflicted rule, stated separately from the path case because the two are separate clauses
+# of row G5b and a fixture that carried both could not tell which one fired.
+#
+# The two members observe different paths and agree about them; they disagree about `e-1` alone.
+
+name: conflicted_values
+
+responses:
+  # The opening call: the unit stack is empty and there is nothing to act on yet.
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    result:
+      emitter: manager
+      units:
+        - id: u-conflict-2
+          goal_id: $goal
+          intent: write the note and check it
+          expected:
+            - id: e-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+
+  # The acting call: the manager restates the unit and dispatches its wave. The members are
+  # listed in the order they are handed to the seam, which is the order `member#` is assigned
+  # in — `writer` is member 1 and `checker` member 2, however they are later run.
+  - tier: manager
+    result:
+      emitter: manager
+      units:
+        - id: u-conflict-2
+          goal_id: $goal
+          intent: write the note and check it
+          expected:
+            - id: e-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+      wave:
+        - kind: writer
+          unit_id: u-conflict-2
+          admitted_ref: admitted
+        - kind: checker
+          unit_id: u-conflict-2
+          admitted_ref: admitted
+
+  - tier: dispatch
+    when:
+      kind: writer
+    result:
+      emitter: dispatch
+      unit_id: $unit
+      narrative: wrote the note
+      observations:
+        - path: notes.md
+          exists: true
+          size_bytes: 42
+          content_hash: sha-notes-a
+      exit_code: 0
+      expectation_values:
+        e-1: wrote
+      cited_ids:
+        - c-1
+
+  - tier: dispatch
+    when:
+      kind: checker
+    result:
+      emitter: dispatch
+      unit_id: $unit
+      narrative: checked the note against the ledger
+      observations:
+        - path: checked.md
+          exists: true
+          size_bytes: 11
+          content_hash: sha-checked-a
+      exit_code: 3
+      expectation_values:
+        e-1: read something else entirely
+      cited_ids:
+        - c-1
+        - c-2
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.5

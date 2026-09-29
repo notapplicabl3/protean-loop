@@ -1,0 +1,33 @@
+# Homeostasis — hypothalamus + insula. The ceilings, and nothing else.
+#
+# `the build specification (not in this mirror)` § Deliverable 3 (the `stopped` terminal, "homeostasis's
+# contractual stop, including the tick ceiling from its weights"). Read-only in build 1: the
+# offline sleep graph is the only writer of a weights file and it is build 3.
+#
+# Ruling 16 (b) governs every threshold in the brain — default high, never a single-tick
+# trigger. A ceiling that stops a healthy task is the same failure as a detector that
+# over-fires, one layer up.
+#
+# S-57 (order W8, before the first workload run): `max_tokens` re-seeded 2000000 -> 1200000 from
+# D5-9's measured ~40k cache-creation tokens per COLD structured call x 3 tiers x a ten-tick
+# cold-equivalent allowance; warm ticks cost far less under the cache, so more fit in practice.
+max_ticks: 200
+max_tokens: 1200000
+max_wall_seconds: 3600
+max_error_rate: 0.5
+
+# Conditional firing, build A.1 (`the build specification (not in this mirror)` § Deliverable 1). The
+# node's cheap check fires — the node does its work — when its score is **>= this number**, so
+# **raising** it makes the node skip more. Seeded at zero: A.1 lands the mechanism and the
+# default is that every node works exactly as it did before, which is the only seed under which
+# "conditional firing" adds a capability rather than silently subtracting one. The offline sleep
+# graph is its only writer, on `firing_check`'s own strict loosening arm.
+firing_threshold: 0.0
+
+# The think trigger, build A.2.i (`the build specification (not in this mirror)` § Deliverable 1, the
+# homeostasis rule). This node plans one think call when its ceiling pressure is **>= this
+# number**, in series behind `firing_threshold` above, which reads the same score. **Shipped off**:
+# `null` (or the key absent) plans nothing, so no outer node calls on the shipping seed. The key is
+# static — no sleep rule names it. The on-value is the operator's named seed edit at their go (row B63), never
+# a builder's default; an on-value is a positive number, and anything else is refused at task start.
+think_threshold: null

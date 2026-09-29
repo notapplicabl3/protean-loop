@@ -1,0 +1,97 @@
+# two_unit_wave — a wave whose members name **two different units**: an illegal return.
+#
+# `the build specification (not in this mirror)` § Deliverable 3: "`unit_id` **identical across every
+# member** — a wave whose members name two units is an **illegal return** rather than a merge",
+# and § Deliverable 4's refusal classes: a fault on a `dispatch` member is `SeatUnavailable` to
+# the boundary, the tick completes, and the terminal is `stopped`. Fan-out is an implementation
+# of a unit's work, never a multiplication of units (decision 17).
+#
+# The two members are dispatched for one unit and the second answers about another, which a
+# merge cannot fold: there is one `executor_summary` slot and the monitor grades one unit.
+
+name: two_unit_wave
+
+responses:
+  # The opening call: the unit stack is empty and there is nothing to act on yet.
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    result:
+      emitter: manager
+      units:
+        - id: u-two-1
+          goal_id: $goal
+          intent: write the note and check it
+          expected:
+            - id: e-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+
+  # The acting call: the manager restates the unit and dispatches its wave. The members are
+  # listed in the order they are handed to the seam, which is the order `member#` is assigned
+  # in — `writer` is member 1 and `checker` member 2, however they are later run.
+  - tier: manager
+    result:
+      emitter: manager
+      units:
+        - id: u-two-1
+          goal_id: $goal
+          intent: write the note and check it
+          expected:
+            - id: e-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+      wave:
+        - kind: writer
+          unit_id: u-two-1
+          admitted_ref: admitted
+        - kind: checker
+          unit_id: u-two-1
+          admitted_ref: admitted
+
+  - tier: dispatch
+    when:
+      kind: writer
+    result:
+      emitter: dispatch
+      unit_id: $unit
+      narrative: wrote the note
+      observations:
+        - path: notes.md
+          exists: true
+          size_bytes: 42
+          content_hash: sha-notes-a
+      exit_code: 0
+      expectation_values:
+        e-1: wrote
+      cited_ids:
+        - c-1
+
+  - tier: dispatch
+    when:
+      kind: checker
+    result:
+      emitter: dispatch
+      unit_id: u-two-SOMETHING-ELSE
+      narrative: checked the note against the ledger
+      observations:
+        - path: checked.md
+          exists: true
+          size_bytes: 11
+          content_hash: sha-checked-a
+      exit_code: 3
+      expectation_values:
+        e-2: checked
+      cited_ids:
+        - c-1
+        - c-2
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.5

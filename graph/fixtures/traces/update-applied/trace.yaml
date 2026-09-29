@@ -1,0 +1,39 @@
+# Arm 1 of § DoD row N3: an update that applies.
+#
+# Three admissible pairs across two tasks, one of them unmatched, so the window's match rate is
+# below 1.0 and § Resolutions D8-4's discriminator proposes the TIGHTENING step. k = 3 across
+# ≥ 2 tasks is the whole floor for a tightening move, and the second task is read back out of
+# project memory rather than off another task's node traces (§ Directional decisions 22).
+#
+# The hippocampus signal funds three keys, so one arm exercises an integer step, a second integer
+# step and a ratio step in one run — which is also what makes `bounded_step` visible in the
+# byte-expected file rather than only in a unit test.
+
+arm: update-applied
+about: three admissible pairs across two tasks, one unmatched — the tightening step applies
+
+run:
+  task: task-fixture
+  final_tick: 4
+  terminal: done
+  pairs:
+    - {kind: hippocampus_citation, tick: 1, matched: true}
+    - {kind: hippocampus_citation, tick: 2, matched: false}
+
+brain:
+  memory:
+    - {node: hippocampus, task: task-earlier, tick: 1, ref: r-1, signal: hippocampus_citation, matched: true}
+
+claims:
+  pairs: 2
+  admissible: 2
+  applied:
+    - {node: hippocampus, key: candidate_window, from: 20, to: 19, direction: tighten, was_seeded: false}
+    - {node: hippocampus, key: semantic_window, from: 8, to: 7, direction: tighten, was_seeded: false}
+    - {node: hippocampus, key: semantic_min_overlap, from: 0.1, to: 0.11, direction: tighten, was_seeded: false}
+  withheld: []
+  procedures_written: []
+  procedures_withdrawn: []
+  files_written:
+    - nodes/hippocampus/weights.yaml
+    - projects/_root/memory/hippocampus/learning.jsonl

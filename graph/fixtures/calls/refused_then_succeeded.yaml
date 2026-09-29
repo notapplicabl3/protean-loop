@@ -1,0 +1,65 @@
+# refused_then_succeeded — the **first pass** of G7's refused-then-succeeded fixture.
+#
+# `the build specification (not in this mirror)` § Deliverable 6: "an entry that records a refusal or a
+# timeout carries no result to restore and that call is **re-invoked in place** — while the
+# journalled calls *after* it still restore, rather than the whole tail being made afresh."
+#
+# It is `torn_tick.yaml` with **the think response removed**, and nothing else. The plan still
+# asks homeostasis to think, so call 1 finds no configured answer and comes back a refusal —
+# journalled and counted (§ Deliverable 2), with no envelope, which is precisely what "an entry
+# recording a refusal" means on disk. Calls 2 and 3 answer normally.
+#
+# **The second pass runs against `torn_tick.yaml`**, whose think response is present: that is
+# what makes the call *succeed* when it is re-invoked in place, and what makes the fixture's
+# name the whole of its claim. Two files rather than one because a script is a fixed set of
+# answers and the fixture's subject is a call that is answered differently on the two passes.
+#
+# **Nothing here spends.** The refusal is a missing scripted response, not a failed process.
+
+name: refused_then_succeeded
+
+responses:
+  - tier: manager
+    when:
+      escalation: empty_unit_stack
+    result:
+      emitter: manager
+      units:
+        - id: u-torn-1
+          goal_id: $goal
+          intent: write the note the goal asks for
+          expected:
+            - id: e-torn-1
+              kind: file_exists
+              arguments:
+                path: notes.md
+
+  - tier: director
+    result:
+      emitter: director
+      modulators:
+        reward_error: 0.0
+        arousal: 0.0
+        confidence: 0.5
+
+  # No `think` response. Call 1 refuses; the calling node proceeds without its answer and the
+  # tick does not stop — an advisory call a node asked on its own account may not end the run.
+
+  - tier: delegate
+    result:
+      emitter: delegate
+      kind: reviewer
+      verdict: the retrieval window is wide enough
+      information: nothing in the last three episodes contradicts the unit
+
+calls:
+  - node: homeostasis
+    type: think
+    payload:
+      question: is this tick's spend near the ceiling?
+      context: the tick's own counters
+  - node: hippocampus
+    type: delegate
+    payload:
+      kind: reviewer
+      question: does anything retrieved contradict the open unit?

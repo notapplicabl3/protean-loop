@@ -1,0 +1,28 @@
+# Arm 11: a vacuous pair excluded.
+#
+# The case § DoD row L1 names by hand: a hippocampus prediction whose `episode_ids` set is empty
+# and whose outcome reports `matched: true`. Nothing was retrieved, so `matched` is independent of
+# what the node did and the pair carries no information at all — the second of § Resolutions
+# A1-13's two exclusions and the one that is easiest to mistake for evidence, because it looks
+# like a success.
+
+arm: pair-vacuous
+about: matched on an empty retrieval — a pair whose verdict rests on nothing
+
+run:
+  task: task-fixture
+  final_tick: 2
+  terminal: done
+  pairs:
+    - {kind: hippocampus_vacuous, tick: 1, matched: true}
+
+claims:
+  pairs: 1
+  admissible: 0
+  excluded: {vacuous: 1}
+  applied: []
+  withheld: []
+  procedures_written: []
+  procedures_withdrawn: []
+  files_written:
+    - projects/_root/memory/hippocampus/learning.jsonl

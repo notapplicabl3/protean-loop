@@ -1,0 +1,160 @@
+# wave_kinds — the heterogeneous `kinds:` container a **bounded** wave is read off.
+#
+# `the build specification (not in this mirror)` § Deliverable 5 and § DoD row G6. `two_kinds.yaml` is
+# the container for § Deliverable 1's shape and § Deliverable 2's floor: one kind per class, both
+# capped 1.0/60. A wave of four of those sums to 4.0 against a `spawn_max_wave_usd` of 10.0, so it
+# can never reach either bound — and **the sum is the whole point**: "`members × one cap` describes
+# no heterogeneous wave that actually exists" (H4), so the fixture that reads the sum back has to be
+# heterogeneous itself.
+#
+# **The arithmetic these six kinds exist to make readable**, against the shipping seed's own bounds
+# (`max_wave_members: 4`, `spawn_max_wave_usd: 10.0`, `spawn_max_call_usd: 5.0`,
+# `spawn_timeout_seconds: 1800`):
+#
+#   alpha 4.0 + beta 3.0 + gamma 2.0 + delta   1.01  = 10.01  → REFUSED, one cent above
+#   alpha 4.0 + beta 3.0 + gamma 2.0 + epsilon 0.99  =  9.99  → RUNS,    one cent below
+#   alpha 4.0 + beta 3.0 + gamma 2.0 + zeta    1.0   = 10.0   → RUNS, and `zeta` crosses its wall
+#   any five of them                                         → REFUSED on the width
+#
+# `zeta` is the one kind whose `timeout_seconds` is short enough for a member to cross it inside a
+# test: a member killed at its own wall is marked failed and the wave merges `partial` while the
+# other three return, which is the third refusal class A.1 declared and never produced.
+#
+# **A fixture kind is not a library kind** (S-A22, § Out of scope): these six name no work at all,
+# ship in no seed, reach no live root and live only here. The shipping `brain/seats.yaml` carries
+# both class sub-mappings EMPTY.
+#
+# `TIER_KEYS` EXACTLY, as everywhere: ten keys, no `class:` (the class is the sub-mapping), no
+# per-kind `sandbox:`, no workspace key and no writable-path key.
+#
+# **The tool grant is the narrowest thing that loads**, deliberately: the positive control of
+# § Deliverable 2's floor is `two_kinds.yaml`'s job, and a block that granted fifteen patterns six
+# times over would bury the two numbers this container exists for. `allowed_tools` is a non-empty
+# subset of the class's licensed patterns and `tools` equals the names those patterns derive — the
+# only thing a seed may do (row G2). The patterns themselves are authored ONCE, in
+# `src/protean/cortex/live/kinds.py` (row M1).
+#
+# `disallowed_tools` is empty and is not a hole: the runtime appends the one `EGRESS_REMOTE`
+# literal to every spawn's `--disallowedTools` whatever a block says.
+#
+# Every `prompt:` names the one shared prefix, `seats/kinds/fixture_wave.md`, for the reason that
+# file states: these kinds differ in two numbers and nothing else.
+kinds:
+  dispatch:
+    fixture_alpha:
+      model: claude-fable-5-1
+      effort: high
+      permission_mode: dontAsk
+      allowed_tools:
+        - Read
+        - Write
+      disallowed_tools: []
+      tools:
+        - Read
+        - Write
+      add_dir: true
+      max_call_usd: 4.0
+      timeout_seconds: 60
+      prompt: seats/kinds/fixture_wave.md
+
+    fixture_beta:
+      model: claude-fable-5-1
+      effort: high
+      permission_mode: dontAsk
+      allowed_tools:
+        - Read
+        - Write
+      disallowed_tools: []
+      tools:
+        - Read
+        - Write
+      add_dir: true
+      max_call_usd: 3.0
+      timeout_seconds: 60
+      prompt: seats/kinds/fixture_wave.md
+
+    fixture_gamma:
+      model: claude-fable-5-1
+      effort: high
+      permission_mode: dontAsk
+      allowed_tools:
+        - Read
+        - Write
+      disallowed_tools: []
+      tools:
+        - Read
+        - Write
+      add_dir: true
+      max_call_usd: 2.0
+      timeout_seconds: 60
+      prompt: seats/kinds/fixture_wave.md
+
+    # One cent above what the other three leave, so the four of them sum to 10.01.
+    fixture_delta:
+      model: claude-fable-5-1
+      effort: high
+      permission_mode: dontAsk
+      allowed_tools:
+        - Read
+        - Write
+      disallowed_tools: []
+      tools:
+        - Read
+        - Write
+      add_dir: true
+      max_call_usd: 1.01
+      timeout_seconds: 60
+      prompt: seats/kinds/fixture_wave.md
+
+    # One cent below, so the same wave with this member in `delta`'s place sums to 9.99 and runs.
+    fixture_epsilon:
+      model: claude-fable-5-1
+      effort: high
+      permission_mode: dontAsk
+      allowed_tools:
+        - Read
+        - Write
+      disallowed_tools: []
+      tools:
+        - Read
+        - Write
+      add_dir: true
+      max_call_usd: 0.99
+      timeout_seconds: 60
+      prompt: seats/kinds/fixture_wave.md
+
+    # The member that crosses its own wall: one second, which a stand-in told to sleep longer than
+    # that really does cross. The cap stays well under `spawn_max_call_usd`, so the kind loads.
+    fixture_zeta:
+      model: claude-fable-5-1
+      effort: high
+      permission_mode: dontAsk
+      allowed_tools:
+        - Read
+        - Write
+      disallowed_tools: []
+      tools:
+        - Read
+        - Write
+      add_dir: true
+      max_call_usd: 1.0
+      timeout_seconds: 0.3
+      prompt: seats/kinds/fixture_wave.md
+
+  delegate:
+    # The delegate opened through the seam by the `node_calls` desk's own arm (row G3's last
+    # clause). `add_dir: false`, because a delegate's allowed set is the writable trees alone and
+    # the task workspace is simply **absent** from it rather than named in a deny list.
+    fixture_reader:
+      model: claude-fable-5-1
+      effort: high
+      permission_mode: dontAsk
+      allowed_tools:
+        - Read
+      disallowed_tools: []
+      tools:
+        - Read
+      add_dir: false
+      max_call_usd: 1.0
+      timeout_seconds: 60
+      prompt: seats/kinds/fixture_wave.md

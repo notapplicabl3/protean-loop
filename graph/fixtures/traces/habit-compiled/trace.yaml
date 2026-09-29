@@ -1,0 +1,48 @@
+# Arm 8: a habit compiled.
+#
+# Two planner pairs on the same goal in this run, plus one earlier task's planner pair read back
+# out of project memory: three admissible pairs across two tasks, every one of them matched. The
+# four gates of § Resolutions D16-4 pass in order — admissible, planner tier, `match_rate == 1.0`,
+# and the SAME persistence floor a weight update clears — and the compiler writes a `SeatScript`
+# whose one condition binds `goal_digest` and nothing else.
+#
+# The compiled response's `result` is the planner's own journalled answer with the source goal id
+# replaced by `$goal` (§ Resolutions D16-3), which is why the byte-expected procedure file one
+# tree over carries a placeholder where a task-scoped id would otherwise be.
+#
+# This arm also populates all five report groups at once — the cortex keys `manager_horizon` and
+# `k_replan` are considered on the same window and withheld by the loosening floor — so it is the
+# arm § DoD row L9's re-check reads.
+
+arm: habit-compiled
+about: three matched planner pairs across two tasks on one goal — the habit clears every gate
+
+run:
+  task: task-fixture
+  final_tick: 4
+  terminal: done
+  goal: reconcile the pins and make the suite runnable
+  unit: u-1
+  units:
+    - {id: u-1}
+  pairs:
+    - {kind: manager_horizon, tick: 1, matched: true}
+    - {kind: manager_horizon, tick: 3, matched: true}
+  planner_journals: [1, 3]
+
+brain:
+  memory:
+    - {node: cortex, task: task-earlier, tick: 1, ref: "task-earlier:1:cortex:manager:prediction", signal: manager_horizon, matched: true}
+
+claims:
+  pairs: 2
+  admissible: 2
+  applied: []
+  withheld:
+    - {node: cortex, key: k_replan, direction: loosen, because: "6 required to loosen"}
+    - {node: cortex, key: manager_horizon, direction: loosen, because: "6 required to loosen"}
+  procedures_written: [habit-manager-6656c6fb4e2aa146]
+  procedures_withdrawn: []
+  files_written:
+    - nodes/cortex/procedures/habit-manager-6656c6fb4e2aa146.yaml
+    - projects/_root/memory/cortex/learning.jsonl
