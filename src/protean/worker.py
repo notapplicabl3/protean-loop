@@ -1,5 +1,9 @@
 """One contained editor call per unit, in a fresh clone with no remote, on branch `unit/<task>/<unit>`.
 
+The editor process and everything it starts run under `sandbox-exec` with every write denied outside
+the clone, uv's caches, the temp dirs and `/dev`; a Write, an Edit or a shell command that leaves those
+trees, directly or through a symlink, fails at the kernel. Without the sandbox binary no editor runs.
+
 The branch starts at the tip of `task/<task>`, the work accepted so far, and is fetched back into the
 workspace; nothing is ever merged or pushed. Only a clone left clean on its branch, fetched, and
 still extending that tip counts as delivered.
@@ -20,9 +24,10 @@ from protean.runner import Charge, Runner, RunResult, charged_cap, no_charge, us
 from protean.state import Root, Task, Unit
 
 MODEL = "claude-opus-5"
+SANDBOX = "sandbox-exec"
 TOOLS = (
     "Read", "Edit", "Write", "Grep", "Glob", "Bash(uv:*)", "Bash(git status:*)", "Bash(git diff:*)",
-    "Bash(git add:*)", "Bash(git commit:*)", "Bash(git checkout:*)", "Bash(git branch:*)",
+    "Bash(git add:*)", "Bash(git commit:*)", "Bash(git checkout:*)", "Bash(git branch:*)", "Bash(git rm:*)",
 )
 BUILD_OUTPUT = (".venv/", "__pycache__/", "*.pyc", ".pytest_cache/", ".ruff_cache/", ".mypy_cache/",
                 "node_modules/", ".DS_Store")
@@ -77,9 +82,25 @@ def accepted_tip(task: Task) -> str:
     return task.accepted
 
 
-def argv(task: Task, caps: Caps, root: Root) -> list[str]:
-    """The editor call: no user settings, the positive tool grant, the clipped per-call dollar cap, the prompt."""
+def sandbox_profile(clone: Path) -> str:
+    """The editor's profile: writes denied everywhere but the clone, uv's caches, the temp dirs and `/dev`,
+    the same trees a check command gets (`grade.writable_trees`); the network stays open for the model call."""
+    return f"(version 1)(allow default)(deny file-write*)(allow file-write* {grade.write_clauses(clone)})"
+
+
+def sandbox_binary() -> str:
+    """The sandbox binary's path; without it the editor cannot run confined, so it does not run at all."""
+    found = shutil.which(SANDBOX)
+    if found is None:
+        raise WorkerError(f"no sandbox: {SANDBOX} is not on this host, so no editor runs")
+    return found
+
+
+def argv(task: Task, caps: Caps, root: Root, clone: Path, sandbox: str) -> list[str]:
+    """The editor call, wrapped in the sandbox: no user settings, the positive tool grant, the clipped
+    per-call dollar cap, the prompt."""
     return [
+        sandbox, "-p", sandbox_profile(clone),
         "claude", "-p", "--setting-sources", "", "--output-format", "json",
         "--max-budget-usd", usd_cap(caps.worker_call_usd, task, caps),
         "--model", MODEL, "--permission-mode", "dontAsk", "--allowedTools", *TOOLS,
@@ -152,6 +173,7 @@ def run_unit(task: Task, unit: Unit, caps: Caps, root: Root, runner: Runner, cha
     delivered nothing; one that no longer contains the accepted tip rewrote history.
     A call interrupted before it returns is charged its cap through `charge` before propagating."""
     workspace, branch = Path(task.workspace), f"unit/{task.id}/{unit.id}"
+    sandbox = sandbox_binary()
     base = accepted_tip(task)
     clone = root.clones_dir(task.id).resolve() / unit.id
     if clone.exists():
@@ -163,7 +185,7 @@ def run_unit(task: Task, unit: Unit, caps: Caps, root: Root, runner: Runner, cha
     exclude = clone / ".git" / "info" / "exclude"
     exclude.parent.mkdir(parents=True, exist_ok=True)
     exclude.write_text("\n".join(BUILD_OUTPUT) + "\n", encoding="utf-8")
-    call = argv(task, caps, root)
+    call = argv(task, caps, root, clone, sandbox)
     try:
         res = runner(call, message(unit), clone, caps.worker_wall_seconds)
     except BaseException:

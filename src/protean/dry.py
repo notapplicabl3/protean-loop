@@ -44,9 +44,11 @@ class ScriptedRunner:
         self.calls: list[tuple[list[str], str | None, Path, int]] = []
 
     def __call__(self, argv: list[str], stdin: str | None, cwd: Path, timeout: int) -> RunResult:
+        self.calls.append((argv, stdin, cwd, timeout))
+        if argv and argv[0].endswith("sandbox-exec") and argv[1:2] == ["-p"]:
+            argv = argv[3:]
         if not argv or argv[0] != "claude":
             raise ValueError(f"the scripted runner only answers model calls, got {argv[:1]}")
-        self.calls.append((argv, stdin, cwd, timeout))
         seat, queue = ("worker", self.worker) if "Write" in argv else ("director", self.director)
         if not queue:
             raise RuntimeError(f"the scripted {seat} has no reply left")

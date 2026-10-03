@@ -19,7 +19,7 @@ from protean.state import Predicate, Unit
 PREDICATE_KINDS: dict[str, tuple[frozenset[str], frozenset[str]]] = {
     "file_exists": (frozenset({"path"}), frozenset()),
     "file_contains": (frozenset({"path", "text"}), frozenset()),
-    "exit_code": (frozenset({"code"}), frozenset()),
+    "exit_code": (frozenset({"code"}), frozenset()),  # still decodes for old records; the loop requires exit 0 before grading
     "command": (frozenset({"cmd"}), frozenset({"expect_exit"})),
 }
 INT_ARGS = frozenset({"code", "expect_exit"})
@@ -176,13 +176,15 @@ def _kill_group(proc: subprocess.Popen) -> None:
         pass
 
 
-def _quoted(path: str) -> str:
+def quoted(path: str) -> str:
     """A path as a sandbox-profile string literal."""
     return '"' + path.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
-def _sandbox_profile(clone: Path) -> str:
-    """No network at all; writes only inside the clone, the uv caches and the temp dirs."""
+def writable_trees(clone: Path) -> list[str]:
+    """Where a confined process may write: the clone, uv's caches, the temp dirs and /dev, as realpaths
+    (sandbox-exec matches a subpath against the realpath, so a symlink that leaves these trees is denied).
+    Shared by a check command's profile and the editor's."""
     home = Path.home()
     writable = [
         os.path.realpath(clone),
@@ -191,8 +193,17 @@ def _sandbox_profile(clone: Path) -> str:
         os.path.realpath(tempfile.gettempdir()),
         *SANDBOX_WRITABLE,
     ]
-    allow = " ".join(f"(subpath {_quoted(path)})" for path in dict.fromkeys(writable))
-    return f"(version 1)(allow default)(deny network*)(deny file-write*)(allow file-write* {allow})"
+    return list(dict.fromkeys(writable))
+
+
+def write_clauses(clone: Path) -> str:
+    """The `(allow file-write* ...)` body for `writable_trees`."""
+    return " ".join(f"(subpath {quoted(path)})" for path in writable_trees(clone))
+
+
+def _sandbox_profile(clone: Path) -> str:
+    """No network at all; writes only inside the clone, the uv caches and the temp dirs."""
+    return f"(version 1)(allow default)(deny network*)(deny file-write*)(allow file-write* {write_clauses(clone)})"
 
 
 def _command(clone: Path, args: dict) -> tuple[bool | None, str]:

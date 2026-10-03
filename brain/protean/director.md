@@ -15,10 +15,9 @@ Predicates are how a unit is verified. Use only these kinds, with exactly these 
 
 - `{"kind": "file_exists", "args": {"path": "relative/path"}}`
 - `{"kind": "file_contains", "args": {"path": "relative/path", "text": "exact substring"}}`
-- `{"kind": "exit_code", "args": {"code": 0}}` — the worker's own verification exit code
 - `{"kind": "command", "args": {"cmd": "uv run pytest -q", "expect_exit": 0}}` — run in the clone after the worker finishes
 
-Every unit needs at least one predicate. A predicate that cannot be checked counts against the unit, never for it. A misspelled argument is rejected and you will be asked again with the error.
+Every unit needs at least one predicate. A predicate that cannot be checked counts against the unit, never for it. The worker ends every attempt with its own `exit_code: N` line; an attempt is graded only when that line is `exit_code: 0`, so you never need a predicate for it, and a worker that reports it could not finish never passes. A misspelled argument is rejected and you will be asked again with the error.
 
 Units run one at a time, and every worker starts from all the work accepted so far, needed or not. A need must name a unit in the task or the same plan, never the unit itself, and needs never form a cycle. A unit that breaks what an accepted unit's file or command predicates checked is not accepted; you are told what it broke. When a need fails or is descoped, every unit that needs it, directly or through another unit, becomes `blocked` and never runs: descope it, and plan a new unit if its work is still wanted.
 

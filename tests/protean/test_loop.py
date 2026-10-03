@@ -67,7 +67,8 @@ def test_a_failing_unit_stays_pending_then_fails_after_two_attempts(env: tuple[R
         loop.run_tick(task, Caps(), root, runner)
         seen.append((task.units[0].status, task.units[0].attempts))
     assert seen == [("pending", 0), ("pending", 1), ("failed", 2)]
-    assert "[grade: p1 file_exists: missing: a.txt; p2 exit_code: exit 1, expected 0]" in task.units[0].summary
+    assert ("[grade: p1 file_exists: the worker reported exit_code 1; nothing was graded; "
+            "p2 exit_code: the worker reported exit_code 1; nothing was graded]") in task.units[0].summary
 
 
 def test_an_uncommitted_write_is_not_delivered_and_cannot_pass(env: tuple[Root, Path], monkeypatch: pytest.MonkeyPatch):
@@ -313,3 +314,64 @@ def test_an_interrupted_worker_call_with_little_left_is_charged_the_clipped_cap(
     with pytest.raises(KeyboardInterrupt):
         loop.run_tick(task, Caps(), root, _interrupt)
     assert load(root, task.id).cost_usd == 10.0
+
+
+NO_EXIT_UNIT = {"id": "u-1", "intent": "write a.txt", "predicates": [{"kind": "file_exists", "args": {"path": "a.txt"}}]}
+
+
+def _one_verdict(root: Root, task: Task) -> dict:
+    (verdict,) = [e for e in director.read_log(root, task.id) if e["event"] == "verdict"]
+    return verdict
+
+
+def test_a_worker_reporting_exit_code_1_cannot_pass_even_when_every_predicate_holds(env: tuple[Root, Path]):
+    root, workspace = env
+    task = _task(root, workspace)
+    unmet = {**PASS, "exit_code": 1, "result": "wrote a.txt but the intent is unmet"}
+    runner = ScriptedRunner([_reply({"units": [NO_EXIT_UNIT]})], [unmet])
+    loop.run_tick(task, Caps(), root, runner)
+    loop.run_tick(task, Caps(), root, runner)
+    assert (task.units[0].status, task.units[0].attempts) == ("pending", 1)
+    verdict = _one_verdict(root, task)
+    assert (verdict["passed_ids"], verdict["ungradeable_ids"], verdict["passed"]) == ([], ["p1"], False)
+    assert verdict["notes"]["p1"] == "file_exists: the worker reported exit_code 1; nothing was graded"
+
+
+def test_a_worker_with_no_exit_code_line_cannot_pass(env: tuple[Root, Path]):
+    root, workspace = env
+    task = _task(root, workspace)
+    silent = {key: value for key, value in PASS.items() if key != "exit_code"}
+    runner = ScriptedRunner([_reply({"units": [NO_EXIT_UNIT]})], [silent])
+    loop.run_tick(task, Caps(), root, runner)
+    loop.run_tick(task, Caps(), root, runner)
+    assert (task.units[0].status, task.units[0].attempts) == ("pending", 1)
+    verdict = _one_verdict(root, task)
+    assert (verdict["ungradeable_ids"], verdict["passed"]) == (["p1"], False)
+    assert verdict["notes"]["p1"] == "file_exists: the worker reported no exit_code line; nothing was graded"
+
+
+def test_a_deletion_is_delivered_and_graded_in_the_clone(env: tuple[Root, Path]):
+    root, workspace = env
+    task = _task(root, workspace)
+    unit = {"id": "u-1", "intent": "remove README.md", "predicates": [
+        {"kind": "command", "args": {"cmd": "test ! -e README.md", "expect_exit": 0}}]}
+    removal = {"delete": ["README.md"], "commit": True, "exit_code": 0, "result": "removed it", "total_cost_usd": 0.5}
+    runner = ScriptedRunner([_reply({"units": [unit]})], [removal])
+    loop.run_tick(task, Caps(), root, runner)
+    loop.run_tick(task, Caps(), root, runner)
+    assert (task.units[0].status, task.units[0].attempts) == ("passed", 1)
+    verdict = _one_verdict(root, task)
+    assert (verdict["passed_ids"], verdict["changed"]) == (["p1"], ["README.md"])
+
+
+def test_exit_code_0_permits_grading_and_never_substitutes_for_it(env: tuple[Root, Path]):
+    root, workspace = env
+    task = _task(root, workspace)
+    wrong = {**PASS, "write": {"b.txt": "not the file asked for\n"}}
+    runner = ScriptedRunner([_reply({"units": [NO_EXIT_UNIT]})], [wrong, wrong])
+    for _ in range(3):
+        loop.run_tick(task, Caps(), root, runner)
+    assert (task.units[0].status, task.units[0].attempts) == ("failed", 2)
+    first, _ = [e for e in director.read_log(root, task.id) if e["event"] == "verdict"]
+    assert (first["failed_ids"], first["ungradeable_ids"], first["passed"]) == (["p1"], [], False)
+    assert first["notes"]["p1"] == "file_exists: missing: a.txt"

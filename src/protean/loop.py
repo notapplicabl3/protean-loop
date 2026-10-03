@@ -1,5 +1,9 @@
 """The loop: each tick either asks the director or runs one runnable unit; only the grader passes one.
 
+A delivered attempt is graded only when the worker's own closing line is `exit_code: 0`; a nonzero or
+missing line makes the attempt ungradeable before any predicate is read. Zero permits grading, never
+substitutes for it.
+
 A pass is two writes: the unit is saved `passed` with its candidate commit, then `task/<task>` moves to
 that commit and the unit is saved integrated. A tick or resume first finishes any pass cut between them.
 """
@@ -193,12 +197,15 @@ def _worker_step(task: Task, unit: Unit, caps: Caps, root: Root, runner: Runner)
     res = worker.run_unit(task, unit, caps, root, runner, _charger(task, root, "worker"))
     task.cost_usd += res.cost_usd
     state.save(root, task)
-    if res.delivered:
+    if res.delivered and res.exit_code == 0:
         verdict = grade.grade(unit, res.clone, res.exit_code)
         broke = _rechecks(task, res.clone) if verdict.passed else {}
         tampered = worker.clone_changes(res.clone, res.candidate)
         if tampered:
             verdict, broke = grade.ungradeable(unit, tampered), {}
+    elif res.delivered:
+        reported = f"exit_code {res.exit_code}" if res.exit_code is not None else "no exit_code line"
+        verdict, broke = grade.ungradeable(unit, f"the worker reported {reported}; nothing was graded"), {}
     else:
         verdict, broke = grade.ungradeable(unit, res.delivery_note), {}
     passed = verdict.passed and not broke

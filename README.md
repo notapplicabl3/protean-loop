@@ -29,7 +29,7 @@ Caps live in `brain/protean/config.json`: $10 per task, $2 per director call, $4
 
 `task/<task>` is the task's accepted work: it starts at the workspace HEAD when the first unit runs, every unit branches from its tip, and it only fast-forwards to a unit's commit once that unit passed and every earlier passed unit's file and command predicates still hold on it. A unit may name `needs`; it runs only after they pass, and when one fails or is descoped it becomes `blocked`.
 
-A unit passes only when its branch carries a change and every predicate holds. Four predicate kinds: `file_exists` and `file_contains` read the branch's committed regular files (never the working tree, a symlink, a nested repo or `.git`); `exit_code` is the worker's own reported verification code, never sufficient on its own; and a `command` predicate runs in the clone under `sandbox-exec` with no network and writes confined to the clone, uv's caches and the temp dirs.
+A unit passes only when its branch carries a change, the editor's own closing line is `exit_code: 0`, and every predicate holds. Three predicate kinds: `file_exists` and `file_contains` read the branch's committed regular files (never the working tree, a symlink, a nested repo or `.git`), and a `command` predicate runs in the clone under `sandbox-exec` with no network and writes confined to the clone, uv's caches and the temp dirs. The editor process itself runs under `sandbox-exec` too, with the same write confinement and the network open: a Write, Edit, `git rm` or shell command that leaves those trees, directly or through a symlink, fails at the kernel, and without the sandbox binary no editor runs.
 
 ## Where things are
 
@@ -42,15 +42,17 @@ tests/protean/        the battery and the shim
 evidence/live-1-2026-09-27/   the first live run: task record, event log, run output (done, 3 ticks, $0.75)
 evidence/live-2-2026-09-27/   the second: parked twice and resumed twice, done in 5 ticks for $2.62
 evidence/live-3-2026-09-29/   the third: three units with needs, the dependent one planned first, done in 5 ticks for $1.51
+evidence/live-4-2026-10-02/   the fourth: a goal built to contradict itself; a retained predicate broken, a unit failed, a dependent blocked, two descoped, done for $4.98
+evidence/live-5-2026-10-03/   the fifth: the first editor under the sandbox; git rm, tests, a commit, one deliberate outside write refused at the kernel (one call, $0.86)
 ```
 
-The receipts predate two renames: `manager` in them is the director seat, and live-1's brain root was still called `mvp`. Live-2 parked first on the design question the goal demanded, then on a decoder bug (the director's plan arrived one `}` short and the decoder misread it), which was fixed and pinned by a test before the second resume; both answers are in the `-answered` files.
+The receipts predate two renames: `manager` in them is the director seat, and live-1's brain root was still called `mvp`. Live-2 parked first on the design question the goal demanded, then on a decoder bug (the director's plan arrived one `}` short and the decoder misread it), which was fixed and pinned by a test before the second resume; both answers are in the `-answered` files. Live-4's two mailbox answers were written by the Claude session driving the run under the operator's authorization, not by the operator, and its `done` records failure handling proven rather than the goal met: one unit stayed falsely passed, which is the finding that led to the exit-code gate. Live-5 ran from an isolated brain root with `max_ticks` 2 and one attempt, so exactly one editor call could spend, and its editor prompt carried a one-run exception allowing the probe write.
 
 ## Design notes
 
 **Only the grader passes a unit.** The director's reply never carries a status, and `done` is refused until every unit is verified or descoped. The three ways the earlier implementation let a unit pass falsely — a misspelled predicate argument dropped from the verdict, a misspelled `file_contains` argument passing on any content, a re-plan overwriting a unit's status — are pinned as negative tests in `tests/protean/test_grade.py`, `test_director.py` and `test_loop.py`.
 
-**Predicates read the branch, never the working tree.** A pre-existing file cannot satisfy a unit, a symlink or a nested repository is not a file, a check command runs sandboxed, and the worker's self-reported exit code never passes a unit on its own: the branch must carry a change and every other predicate must hold.
+**Predicates read the branch, never the working tree.** A pre-existing file cannot satisfy a unit, a symlink or a nested repository is not a file, a check command runs sandboxed, and the worker's self-reported exit code gates grading without ever substituting for it: a nonzero or missing `exit_code` line makes the attempt ungradeable, and a zero one still leaves every predicate to hold on a branch that carries a change.
 
 **Cost is summed from receipts, never from tokens.** A capped call reports its dollars in the CLI receipt with zero tokens; a call that leaves no receipt is charged the cap it carried. An interrupted call books its spend to disk before the signal propagates.
 
@@ -74,4 +76,4 @@ The renaming was small: the operator's name in the loop's notes, the director pr
 
 ## Status
 
-The rewrite reached `done` on its first three live runs (receipts under `evidence/`; the second needed a decoder fix mid-run; the third ran three units in dependency order with the accepted branch advancing each time); a failed attempt, a blocked unit and a broken retained predicate are the paths not yet exercised live. This mirror is re-exported by hand and lags the working repository. **Last updated: 2026-09-29.**
+The rewrite reached `done` on its first four live runs (receipts under `evidence/`; the second needed a decoder fix mid-run; the third ran three units in dependency order with the accepted branch advancing each time; the fourth forced a failed attempt, a broken retained predicate and a blocked unit and surfaced three defects, since repaired: a worker's own nonzero exit now blocks grading, the editor can delete a tracked file, and the editor process runs write-confined under `sandbox-exec`), and the fifth witnessed one confined editor working and one outside write refused. Not yet exercised live: a confined editor hitting its dollar cap or wall timeout. This mirror is re-exported by hand and lags the working repository. **Last updated: 2026-10-03.**

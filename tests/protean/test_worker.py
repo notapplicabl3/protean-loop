@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import shutil
 import subprocess
 import time
 from pathlib import Path
@@ -37,12 +39,13 @@ def test_the_clone_works_on_unit_branch_and_the_branch_lands_unmerged(ready: tup
     runner = ScriptedRunner([], [WRITE_A])
     res = worker.run_unit(task, task.units[0], Caps(), root, runner)
     argv, stdin, cwd, timeout = runner.calls[0]
-    assert argv == [
+    assert argv[:2] == [worker.sandbox_binary(), "-p"] and argv[2] == worker.sandbox_profile(res.clone)
+    assert argv[3:] == [
         "claude", "-p", "--setting-sources", "", "--output-format", "json", "--max-budget-usd", "4.00",
         "--model", "claude-opus-5",
         "--permission-mode", "dontAsk", "--allowedTools", "Read", "Edit", "Write", "Grep", "Glob", "Bash(uv:*)",
         "Bash(git status:*)", "Bash(git diff:*)", "Bash(git add:*)", "Bash(git commit:*)", "Bash(git checkout:*)",
-        "Bash(git branch:*)", "--system-prompt", "# editor prompt\n",
+        "Bash(git branch:*)", "Bash(git rm:*)", "--system-prompt", "# editor prompt\n",
     ]
     assert cwd == res.clone == root.clones_dir(task.id) / "u1" and timeout == 900
     assert stdin.startswith("Unit u1: write a.txt") and 'p1 file_exists {"path": "a.txt"}' in stdin
@@ -219,3 +222,76 @@ def test_real_runner_kills_the_group_when_interrupted(tmp_path: Path, monkeypatc
     assert proc.poll() is not None
     time.sleep(1.5)
     assert not (tmp_path / "late").exists()
+
+
+# --- write confinement: the editor process runs under sandbox-exec, write-denied outside named trees ---
+
+
+def _confined(clone: Path, script: str) -> subprocess.CompletedProcess:
+    argv = ["sandbox-exec", "-p", worker.sandbox_profile(clone), "/bin/sh", "-c", script]
+    return subprocess.run(argv, cwd=clone, capture_output=True, text=True)
+
+
+@pytest.fixture
+def clone(tmp_path: Path) -> Path:
+    return make_workspace(tmp_path / "clone")
+
+
+@pytest.fixture
+def outside_home() -> Path:
+    """A path under the home tree, outside every allowed tree; removed afterwards if a write ever lands."""
+    probe = Path.home() / f".protean-confinement-probe-{os.getpid()}"
+    yield probe
+    if probe.is_symlink() or probe.is_file():
+        probe.unlink()
+    elif probe.is_dir():
+        shutil.rmtree(probe)
+
+
+def test_the_profile_denies_a_write_outside_the_clone(clone: Path, outside_home: Path):
+    proc = _confined(clone, f"echo escaped > {outside_home}")
+    assert proc.returncode != 0 and not outside_home.exists()
+    assert "not permitted" in (proc.stderr + proc.stdout).lower()
+
+
+def test_the_profile_denies_a_write_through_a_symlink_that_leaves_the_clone(clone: Path, outside_home: Path):
+    outside_home.mkdir()
+    (clone / "door").symlink_to(outside_home)
+    proc = _confined(clone, "echo escaped > door/escape.txt")
+    assert proc.returncode != 0 and not (outside_home / "escape.txt").exists()
+
+
+def test_the_profile_allows_a_write_in_the_temp_root_the_tools_need(clone: Path, tmp_path: Path):
+    proc = _confined(clone, f"echo scratch > {tmp_path / 'scratch.txt'}")
+    assert proc.returncode == 0 and (tmp_path / "scratch.txt").exists()
+
+
+def test_the_profile_allows_edits_deletion_a_test_run_and_a_commit_inside_the_clone(clone: Path):
+    script = ("echo new > a.txt && git rm -q README.md && git add -A && "
+              "git -c user.name=t -c user.email=t@t.invalid commit -qm confined && "
+              "uv run --no-project python -c 'open(\"b.txt\", \"w\").write(\"ran\")'")
+    proc = _confined(clone, script)
+    assert proc.returncode == 0, proc.stderr
+    assert (clone / "a.txt").exists() and not (clone / "README.md").exists() and (clone / "b.txt").read_text() == "ran"
+    assert _git(clone, "log", "--format=%s", "-1") == "confined"
+
+
+def test_the_profile_denies_writes_outside_the_clone_but_allows_the_named_caches(clone: Path):
+    profile = worker.sandbox_profile(clone)
+    assert profile.startswith("(version 1)(allow default)(deny file-write*)(allow file-write* ")
+    assert "(deny network*)" not in profile
+    assert f'(subpath "{clone.resolve()}")' in profile and '(subpath "/private/tmp")' in profile
+
+
+def test_the_editor_call_is_wrapped_in_the_sandbox_and_refused_without_it(ready: tuple[Root, Task], monkeypatch: pytest.MonkeyPatch):
+    root, task = ready
+    runner = ScriptedRunner([], [WRITE_A])
+    res = worker.run_unit(task, task.units[0], Caps(), root, runner)
+    (argv, _, _, _) = runner.calls[0]
+    assert argv[0].endswith("sandbox-exec") and argv[1] == "-p" and argv[2] == worker.sandbox_profile(res.clone)
+    assert argv[3:5] == ["claude", "-p"]
+    monkeypatch.setattr(worker.shutil, "which", lambda name: None)
+    second = ScriptedRunner([], [WRITE_A])
+    with pytest.raises(worker.WorkerError, match="sandbox-exec"):
+        worker.run_unit(task, task.units[0], Caps(), root, second)
+    assert second.calls == []
